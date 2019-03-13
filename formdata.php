@@ -16,6 +16,12 @@ final class FormData implements \JSONSerializable, \Iterator
 				case 'text/json':
 					static::$_data = json_decode(file_get_contents('php://input'), true);
 					break;
+				case 'application/csp-report':
+					$report = json_decode(file_get_contents('php://input'), true);
+					if (array_key_exists('csp-report', $report)) {
+						static::$_data = $report['csp-report'];
+					}
+					break;
 				case 'text/plain':
 				case 'application/text':
 					static::$_data = ['text' => file_get_contents('php://input')];
