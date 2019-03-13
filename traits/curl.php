@@ -83,7 +83,17 @@ trait cURL
 					break;
 				case 'POST':
 					curl_setopt($ch, CURLOPT_POST, true);
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_body);
+					if (array_key_exists('Content-Type', $this->_headers)) {
+						switch($this->_headers['Content-Type']) {
+							case 'application/json':
+								curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->_body));
+								break;
+							default:
+								curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_body);
+						}
+					} else {
+						curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_body);
+					}
 					break;
 				case 'PUT':
 					curl_setopt($ch, CURLOPT_PUT, true);
