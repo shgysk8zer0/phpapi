@@ -1,7 +1,5 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
-spl_autoload_register('spl_autoload');
-set_include_path(dirname(__DIR__, 2));
 
 final class CSP
 {
@@ -34,6 +32,9 @@ final class CSP
 				header('Content-Security-Policy-Report-Only: ' . join('; ', $csp));
 			} else {
 				header('Content-Security-Policy: ' . join('; ', $csp));
+			}
+			if (isset($this->_report_to)) {
+				header('Report-To: ' . json_encode($this->_report_to));
 			}
 		}
 	}
