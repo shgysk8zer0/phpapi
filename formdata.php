@@ -6,15 +6,37 @@ final class FormData implements \JSONSerializable, \Iterator
 	use Traits\Singleton;
 
 	private static $_escape = true;
+	private static $_data = [];
+
+	final public function __construct()
+	{
+		if (array_key_exists('CONTENT_TYPE', $_SERVER)) {
+			switch (strtolower($_SERVER['CONTENT_TYPE'])) {
+				case 'application/json':
+				case 'text/json':
+					static::$_data = json_decode(file_get_contents('php://input'), true);
+					break;
+				case 'text/plain':
+				case 'application/text':
+					static::$_data = ['text' => file_get_contents('php://input')];
+					break;
+				default:
+					static::$_data = $_POST;
+			}
+		} else {
+			static::$_data = $_POST;
+		}
+
+	}
 
 	final public function get(string $key, bool $escape = true): string
 	{
 		if (! $this->has($key)) {
 			return '';
 		} elseif ($escape) {
-			return htmlentities($_POST[$key]);
+			return htmlentities(static::$_data[$key]);
 		} else {
-			return $_POST[$key];
+			return static::$_data[$key];
 		}
 	}
 
@@ -22,7 +44,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	{
 		$has = true;
 		foreach ($keys as $key) {
-			if (! array_key_exists($key, $_POST)) {
+			if (! array_key_exists($key, static::$_data)) {
 				$has = false;
 				break;
 			}
@@ -47,12 +69,12 @@ final class FormData implements \JSONSerializable, \Iterator
 
 	final public function __debugInfo(): array
 	{
-		return $_POST;
+		return static::$_data;
 	}
 
 	final public function jsonSerialize(): array
 	{
-		return $_POST;
+		return static::$_data;
 	}
 
 	/**
@@ -74,7 +96,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	 */
 	public function key()
 	{
-		return key($_POST);
+		return key(static::$_data);
 	}
 
 	/**
@@ -85,7 +107,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	 */
 	public function next(): void
 	{
-		next($_POST);
+		next(static::$_data);
 	}
 
 	/**
@@ -96,7 +118,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	 */
 	public function rewind(): void
 	{
-		reset($_POST);
+		reset(static::$_data);
 	}
 
 	/**
@@ -120,7 +142,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	 */
 	public function keys(): array
 	{
-		return array_keys($_POST);
+		return array_keys(static::$_data);
 	}
 
 	final public static function setEscape(bool $escape): void

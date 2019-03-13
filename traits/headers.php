@@ -62,7 +62,7 @@ trait Headers
 	final protected static function _getHeaders(): void
 	{
 		if (! empty(static::$_headers)) {
-			$headers = get_all_headers();
+			$headers = getallheaders();
 			$keys = array_map('strtolower', array_keys($headers));
 			$values = array_values($headers);
 			static::$_headers = array_combine($keys, $values);
