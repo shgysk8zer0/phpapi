@@ -126,7 +126,7 @@ class UploadFile implements JSONSerializable
 		}
 	}
 
-	final public static function setHost(string $host): void
+	final public static function setHost(string $host)
 	{
 		static::$_host = $host;
 	}

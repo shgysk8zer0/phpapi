@@ -50,7 +50,7 @@ final class API
 		}
 	}
 
-	final public function __set(string $prop, $value): void
+	final public function __set(string $prop, $value)
 	{
 		switch(strtolower($prop)) {
 			case 'contenttype':
@@ -63,7 +63,7 @@ final class API
 		}
 	}
 
-	final public function on(string $method, callable $callback): void
+	final public function on(string $method, callable $callback)
 	{
 		if (strtoupper($method) === $this->method) {
 			call_user_func($callback);

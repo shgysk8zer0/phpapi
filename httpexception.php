@@ -24,7 +24,7 @@ class HTTPException extends \Exception implements \JSONSerializable
 		];
 	}
 
-	final public function __invoke(bool $exit = true): void
+	final public function __invoke(bool $exit = true)
 	{
 		Headers::status($this->getCode());
 		Headers::set('Content-Type', 'application/json');

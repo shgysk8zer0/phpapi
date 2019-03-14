@@ -54,7 +54,7 @@ class PDO extends \PDO
 		}
 	}
 
-	final public static function setCredsFile(string $creds_file): void
+	final public static function setCredsFile(string $creds_file)
 	{
 		static::$_creds_file = $creds_file;
 	}

@@ -9,7 +9,7 @@ final class Linter
 
 	private $_ignored_dirs = [];
 
-	final public function ignoreDirs(string ...$dirs): void
+	final public function ignoreDirs(string ...$dirs)
 	{
 		$dirs = array_filter($dirs, 'is_dir');
 		$this->_ignored_dirs = array_map(function(string $path): string
@@ -18,7 +18,7 @@ final class Linter
 		}, $dirs);
 	}
 
-	final public function scanExts(string ...$exts): void
+	final public function scanExts(string ...$exts)
 	{
 		$this->_scan_exts = array_map(function(string $ext): string
 		{

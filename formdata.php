@@ -111,7 +111,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	 * @param void
 	 * @return void
 	 */
-	public function next(): void
+	public function next()
 	{
 		next(static::$_data);
 	}
@@ -122,7 +122,7 @@ final class FormData implements \JSONSerializable, \Iterator
 	 * @param void
 	 * @return void
 	 */
-	public function rewind(): void
+	public function rewind()
 	{
 		reset(static::$_data);
 	}
@@ -151,7 +151,7 @@ final class FormData implements \JSONSerializable, \Iterator
 		return array_keys(static::$_data);
 	}
 
-	final public static function setEscape(bool $escape): void
+	final public static function setEscape(bool $escape)
 	{
 		static::$_escape = $escape;
 	}

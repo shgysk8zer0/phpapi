@@ -99,7 +99,7 @@ final class GitHub implements \JSONSerializable
 		return is_array($this->_headers);
 	}
 
-	private function _parse(): void
+	private function _parse()
 	{
 		$type = strtolower($this->contentType);
 		$type = preg_replace('/;\s?boundary=[A-z\d]+$/', null, $type);

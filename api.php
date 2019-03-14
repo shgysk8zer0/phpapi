@@ -32,12 +32,12 @@ class API implements \JSONSerializable
 			throw new HTTPException('Origin not allowed', HTTP::FORBIDDEN);
 		}
 
-		$this->on('OPTIONS', function(): void
+		$this->on('OPTIONS', function()
 		{
 			Headers::set('Allow', join(', ', $this->options));
 		});
 
-		$this->on('HEAD', function(): void
+		$this->on('HEAD', function()
 		{
 			Headers::set('Allow', join(', ', $this->options));
 			Headers::set('Content-Type', 'application/json');
@@ -76,7 +76,7 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __set(string $prop, $value): void
+	final public function __set(string $prop, $value)
 	{
 		switch(strtolower($prop)) {
 			case 'contenttype':
@@ -89,7 +89,7 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __call(string $method, array $args = []): void
+	final public function __call(string $method, array $args = [])
 	{
 		array_unshift($args, $this);
 		$method = strtoupper($method);
@@ -101,7 +101,7 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __invoke(): void
+	final public function __invoke()
 	{
 		$method = $this->method;
 		static::allowMethods(...$this->options);
@@ -151,7 +151,7 @@ class API implements \JSONSerializable
 		];
 	}
 
-	final public function on(string $method, callable $callback): void
+	final public function on(string $method, callable $callback)
 	{
 		$method = strtoupper($method);
 
@@ -209,7 +209,7 @@ class API implements \JSONSerializable
 		return array_key_exists($key, $_FILES);
 	}
 
-	final public function redirect(URL $url, bool $permenant): void
+	final public function redirect(URL $url, bool $permenant)
 	{
 		Headers::redirect($url, $permenant);
 	}

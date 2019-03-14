@@ -79,7 +79,7 @@ final class RandomString
 		return file_put_contents($filename, $this, LOCK_EX);
 	}
 
-	public function setLength(int $length): void
+	public function setLength(int $length)
 	{
 		$this->_length = $length;
 	}
@@ -89,7 +89,7 @@ final class RandomString
 		return $this->_length;
 	}
 
-	public function setLower(bool $include): void
+	public function setLower(bool $include)
 	{
 		$this->_lower = $include;
 	}
@@ -99,7 +99,7 @@ final class RandomString
 		return $this->_lower;
 	}
 
-	public function setUpper(bool $include): void
+	public function setUpper(bool $include)
 	{
 		$this->_upper = $include;
 	}
@@ -109,7 +109,7 @@ final class RandomString
 		return $this->_upper;
 	}
 
-	public function setNumerals(bool $include): void
+	public function setNumerals(bool $include)
 	{
 		$this->_numerals = $include;
 	}
@@ -119,7 +119,7 @@ final class RandomString
 		return $this->_numerals;
 	}
 
-	public function setSpecial(bool $include): void
+	public function setSpecial(bool $include)
 	{
 		$this->_special = $include;
 	}

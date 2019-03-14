@@ -74,7 +74,7 @@ final class DSN implements \JSONSerializable
 		return $this->_charset;
 	}
 
-	final public function setCharset(string $charset): void
+	final public function setCharset(string $charset)
 	{
 		$this->_charset = $charset;
 	}
@@ -84,7 +84,7 @@ final class DSN implements \JSONSerializable
 		return $this->_database;
 	}
 
-	final public function setDatabase(string $database): void
+	final public function setDatabase(string $database)
 	{
 		$this->_database = $database;
 	}
@@ -94,7 +94,7 @@ final class DSN implements \JSONSerializable
 		return $this->_host;
 	}
 
-	final public function setHost(string $host): void
+	final public function setHost(string $host)
 	{
 		$this->_host = $host;
 	}
@@ -104,7 +104,7 @@ final class DSN implements \JSONSerializable
 		return $this->_password;
 	}
 
-	final public function setPassword(string $password): void
+	final public function setPassword(string $password)
 	{
 		$this->_password = $password;
 	}
@@ -114,7 +114,7 @@ final class DSN implements \JSONSerializable
 		return $this->_port;
 	}
 
-	final public function setPort(int $port): void
+	final public function setPort(int $port)
 	{
 		$this->_port = $port;
 	}
@@ -124,7 +124,7 @@ final class DSN implements \JSONSerializable
 		return $this->_type;
 	}
 
-	final public function setType(string $type): void
+	final public function setType(string $type)
 	{
 		$this->_type = $type;
 	}
@@ -134,7 +134,7 @@ final class DSN implements \JSONSerializable
 		return $this->_username;
 	}
 
-	final public function setUsername(string $username): void
+	final public function setUsername(string $username)
 	{
 		$this->_username = $username;
 	}
