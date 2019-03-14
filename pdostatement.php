@@ -13,7 +13,7 @@ final class PDOStatement extends \PDOStatement
 		return $this->queryString;
 	}
 
-	final public function __set(string $param, $value): void
+	final public function __set(string $param, $value)
 	{
 		$this->bindValue(":{$param}", $value, static::getParamType($value));
 	}

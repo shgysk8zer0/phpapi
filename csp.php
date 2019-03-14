@@ -167,7 +167,7 @@ final class CSP
 		return $this;
 	}
 
-	final private function _set(string $key, string $value = null): void
+	final private function _set(string $key, string $value = null)
 	{
 		if (is_string($value)) {
 			$this->_policy[$key] = str_replace([
@@ -188,7 +188,7 @@ final class CSP
 		}
 	}
 
-	final public function _rm(string $key): void
+	final public function _rm(string $key)
 	{
 		unset($this->_policy[$key]);
 	}

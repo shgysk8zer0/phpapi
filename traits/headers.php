@@ -7,12 +7,12 @@ trait Headers
 {
 	static private $_headers = [];
 
-	final public static function set(string $key, string $value, bool $replace = true): void
+	final public static function set(string $key, string $value, bool $replace = true)
 	{
 		header("{$key}: {$value}", $replace);
 	}
 
-	final public static function append(string $key, string $value): void
+	final public static function append(string $key, string $value)
 	{
 		static::set($key, $value, false);
 	}
@@ -29,11 +29,11 @@ trait Headers
 		return array_key_exists(strtolower($key), static::$_headers);
 	}
 
-	final public static function delete(string $key): void
+	final public static function delete(string $key)
 	{
 		header_remove($key);
 	}
-	final public static function redirect(string $url, bool $permenant = false): void
+	final public static function redirect(string $url, bool $permenant = false)
 	{
 		if (! static::sent()) {
 			static::set('Location', $url);
@@ -49,17 +49,17 @@ trait Headers
 		return headers_sent();
 	}
 
-	final public static function status(int $code = HTTP::OK): void
+	final public static function status(int $code = HTTP::OK)
 	{
 		http_response_code($code);
 	}
 
-	final public static function contentType(string $content_type): void
+	final public static function contentType(string $content_type)
 	{
 		static::set('Content-Type', $content_type);
 	}
 
-	final protected static function _getHeaders(): void
+	final protected static function _getHeaders()
 	{
 		if (! empty(static::$_headers)) {
 			$headers = getallheaders();

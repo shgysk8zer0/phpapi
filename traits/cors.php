@@ -7,7 +7,7 @@ trait CORS
 {
 	use Headers;
 
-	final public static function allowCredentials(bool $allow = true): void
+	final public static function allowCredentials(bool $allow = true)
 	{
 		if ($allow) {
 			static::set('Access-Control-Allow-Credentials', true);
@@ -16,31 +16,31 @@ trait CORS
 		}
 	}
 
-	final public static function allowHeaders(string ...$headers): void
+	final public static function allowHeaders(string ...$headers)
 	{
 		static::set('Access-Control-Allow-Headers', join(', ', $headers));
 	}
 
-	final public static function allowMethods(string ...$methods): void
+	final public static function allowMethods(string ...$methods)
 	{
-		array_walk($methods, function(string $method): void
+		array_walk($methods, function(string $method)
 		{
 			$method = strtoupper($method);
 		});
 		static::set('Access-Control-Allow-Methods', join(', ', $methods));
 	}
 
-	final public static function allowOrigin(string $origin = '*'): void
+	final public static function allowOrigin(string $origin = '*')
 	{
 		static::set('Access-Control-Allow-Origin', $origin);
 	}
 
-	final public static function exposeHeaders(string ...$headers): void
+	final public static function exposeHeaders(string ...$headers)
 	{
 		static::set('Access-Control-Expose-Headers', join(', ', $headers));
 	}
 
-	final public static function maxAge(int $age): void
+	final public static function maxAge(int $age)
 	{
 		static::set('Access-Control-Max-Age', "{$age}");
 	}

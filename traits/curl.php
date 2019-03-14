@@ -13,7 +13,7 @@ trait cURL
 	private $_method  = 'GET';
 	private $_body    = [];
 
-	final public function setURL(string $url): void
+	final public function setURL(string $url)
 	{
 		if (filter_var($url, FILTER_VALIDATE_URL)) {
 			if (strpos($url, '?') !== false) {
@@ -27,32 +27,32 @@ trait cURL
 		}
 	}
 
-	final public function setHeader(string $key, string $value): void
+	final public function setHeader(string $key, string $value)
 	{
 		$this->_headers[$key] = $value;
 	}
 
-	final public function setHeaders(array $headers): void
+	final public function setHeaders(array $headers)
 	{
 		array_map([$this, 'setHeader'], array_keys($headers), array_values($headers));
 	}
 
-	final public function setMethod(string $method): void
+	final public function setMethod(string $method)
 	{
 		$this->_method = $method;
 	}
 
-	final public function setParam(string $key, $value): void
+	final public function setParam(string $key, $value)
 	{
 		$this->_body[$key] = $value;
 	}
 
-	final public function setParams(array $params): void
+	final public function setParams(array $params)
 	{
 		array_map([$this, 'setParam'], array_keys($params), array_values($params));
 	}
 
-	final public function addFile(string $name, string $filename): void
+	final public function addFile(string $name, string $filename)
 	{
 		if (file_exists($filename)) {
 			$this->setParam($name, new CURLFile($filename, mime_content_type($filename), $name));

@@ -96,7 +96,7 @@ final class Cookies implements \Iterator, \JSONSerializable
 	 * @param string $value  Value to set it to
 	 * @example $cookies->test = 'Works'
 	 */
-	public function __set(string $key, string$value): void
+	public function __set(string $key, string$value)
 	{
 		$this->_convertKey($key);
 		$_COOKIE[$key] = $value;
@@ -146,7 +146,7 @@ final class Cookies implements \Iterator, \JSONSerializable
 	 * @return void
 	 * @example unset($cookies->$key)
 	 */
-	public function __unset(string $key): void
+	public function __unset(string $key)
 	{
 		$this->_convertKey($key);
 		if (isset($this->$key)) {
@@ -210,7 +210,7 @@ final class Cookies implements \Iterator, \JSONSerializable
 	 * @param void
 	 * @return void
 	 */
-	public function next(): void
+	public function next()
 	{
 		next($_COOKIE);
 	}
@@ -221,7 +221,7 @@ final class Cookies implements \Iterator, \JSONSerializable
 	 * @param void
 	 * @return void
 	 */
-	public function rewind(): void
+	public function rewind()
 	{
 		reset($_COOKIE);
 	}
@@ -250,27 +250,27 @@ final class Cookies implements \Iterator, \JSONSerializable
 		return array_keys($_COOKIE);
 	}
 
-	public function setSecure(bool $secure): void
+	public function setSecure(bool $secure)
 	{
 		$this->_secure = $secure;
 	}
 
-	public function setHttpOnly(bool $httponly): void
+	public function setHttpOnly(bool $httponly)
 	{
 		$this->_httponly = $httponly;
 	}
 
-	public function setDomain(string $domain): void
+	public function setDomain(string $domain)
 	{
 		$this->_domain = $domain;
 	}
 
-	public function setPath(string $path): void
+	public function setPath(string $path)
 	{
 		$this->_path = $path;
 	}
 
-	public function setExpires(int $expires): void
+	public function setExpires(int $expires)
 	{
 		$this->_expires = $expires;
 	}

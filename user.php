@@ -294,7 +294,7 @@ final class User implements \JsonSerializable
 		return $user;
 	}
 
-	final public static function setKey(string $key): void
+	final public static function setKey(string $key)
 	{
 		static::$_key = $key;
 	}

@@ -50,7 +50,7 @@ final class URLSearchParams implements \JSONSerializable
 		}
 	}
 
-	final public function delete(string $key): void
+	final public function delete(string $key)
 	{
 		unset($this->_params[$key]);
 	}

@@ -83,7 +83,7 @@ final class GetData implements \JSONSerializable, \Iterator
 	 * @param void
 	 * @return void
 	 */
-	public function next(): void
+	public function next()
 	{
 		next($_GET);
 	}
@@ -94,7 +94,7 @@ final class GetData implements \JSONSerializable, \Iterator
 	 * @param void
 	 * @return void
 	 */
-	public function rewind(): void
+	public function rewind()
 	{
 		reset($_GET);
 	}
@@ -123,7 +123,7 @@ final class GetData implements \JSONSerializable, \Iterator
 		return array_keys($_GET);
 	}
 
-	final public static function setEscape(bool $escape): void
+	final public static function setEscape(bool $escape)
 	{
 		static::$_escape = $escape;
 	}
