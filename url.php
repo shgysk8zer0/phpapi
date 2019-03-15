@@ -5,19 +5,41 @@ use \shgysk8zer0\PHPAPI\Abstracts\{Ports};
 
 class URL extends Ports implements \JSONSerializable
 {
-	private $_protocol = 'http:';
-	private $_username = '';
-	private $_password = '';
-	private $_hostname = 'localhost';
-	private $_port = null;
-	private $_pathname = '/';
+	private $_protocol     = 'http:';
+	private $_username     = '';
+	private $_password     = '';
+	private $_hostname     = 'localhost';
+	private $_port         = null;
+	private $_pathname     = '/';
 	private $_searchParams = null;
-	private $_hash = '';
+	private $_hash         = '';
 
 	final public function __construct(string $url, string $base = '')
 	{
-		// @TODO Handle relative URLs, such as "./" & "../"
-		$parsed = array_merge(parse_url($base), parse_url($url));
+		$base = parse_url($base);
+		$url = parse_url($url);
+
+		if (array_key_exists('path', $url) and array_key_exists('path', $base) and substr($url['path'], 0, 2) === '..') {
+			$url['path'] = explode('/', $url['path']);
+			$base['path'] = explode('/', rtrim($base['path'], '/'));
+
+			$i = 0;
+			$len = count($url['path']) - 1;
+
+			while ($i < $len and substr($url['path'][$i], 0, 2) === '..' and count($base['path']) !== 0) {
+				array_shift($url['path']);
+				array_pop($base['path']);
+				$i++;
+			}
+
+			$url['path'] = ltrim(str_replace(['../', './'], [null, null], join('/', $url['path'])), '/');
+			$base['path'] = rtrim(join('/', $base['path']), '/');
+			$url['path'] = "{$base['path']}/{$url['path']}";
+			unset($i, $len);
+		}
+
+		$parsed = array_merge($base, $url);
+		unset($base, $url);
 
 		if (array_key_exists('scheme', $parsed)) {
 			$this->_setProtocol("{$parsed['scheme']}:");
@@ -130,6 +152,17 @@ class URL extends Ports implements \JSONSerializable
 		}
 	}
 
+	final public function __isset(string $key): bool
+	{
+		switch($key) {
+			case 'username': return $this->username !== '';
+			case 'password': return $this->password !== '';
+			case 'search': return $this->search !== '';
+			case 'hash': return $this->hash !== '';
+			default: return false;
+		}
+	}
+
 	final public function __debugInfo(): array
 	{
 		return [
@@ -169,12 +202,12 @@ class URL extends Ports implements \JSONSerializable
 
 	final private function _setUsername(string $username)
 	{
-		$this->_username = $username;
+		$this->_username = urldecode($username);
 	}
 
 	final private function _setPassword(string $password)
 	{
-		$this->_password = $password;
+		$this->_password = urldecode($password);
 	}
 
 	final private function _setHostname(string $hostname)
@@ -222,11 +255,13 @@ class URL extends Ports implements \JSONSerializable
 
 	final public static function getRequestUrl(): self
 	{
-		$url = (array_key_exists('HTTPS', $_SERVER) and ! empty($_SERVER['HTTPS']))
+		$url = (! empty($_SERVER['HTTPS']))
 			? 'https://'
 			: 'http://';
+
 		if (array_key_exists('PHP_AUTH_USER', $_SERVER)) {
 			$url .= urlencode($_SERVER['PHP_AUTH_USER']);
+
 			if (array_key_exists('PHP_AUTH_PW', $_SERVER)) {
 				$url .= sprintf(':%s@', urlencode($_SERVER['PHP_AUTH_PW']));
 			} else {
@@ -234,7 +269,6 @@ class URL extends Ports implements \JSONSerializable
 			}
 		}
 		$url .= $_SERVER['HTTP_HOST'] ?? 'localhost';
-		$url .= $_SERVER['REQUEST_URI'] ?? '/';
-		return new URL($url);
+		return new URL($_SERVER['REQUEST_URI'] ?? '/', $url);
 	}
 }
