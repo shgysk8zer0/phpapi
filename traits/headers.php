@@ -44,6 +44,19 @@ trait Headers
 		}
 	}
 
+	final public static function authenticate(string $type = 'BASIC', string $realm = null, string $charset = 'UTF-8')
+	{
+		if (! array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
+			static::status(HTTP::UNAUTHORIZED);
+			if (isset($realm)) {
+				static::set('WWW-Authenticate', sprintf('%s realm="%s", charset="%s"', $type, $realm, $charset));
+			} else {
+				static::set('WWW-Authenticate', $type);
+			}
+			exit();
+		}
+	}
+
 	final public static function sent(): bool
 	{
 		return headers_sent();
