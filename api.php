@@ -64,7 +64,7 @@ class API implements \JSONSerializable
 			case 'remoteaddress': return $_SERVER['REMOTE_ADDR'] ?? null;
 			case 'remotehost': return $_SERVER['REMOTE_HOST'] ?? null;
 			case 'referer':
-			case 'referrer': return $_SERVER['HTTP_REFERER'] ?? null;
+			case 'referrer': return array_key_exists('HTTP_REFERER', $_SERVER) ? new URL($_SERVER['HTTP_REFERER']) : null;
 			case 'requesturi':
 			case 'requesturl': "{$this->_url}";
 			case 'serveraddress': return $_SERVER['SERVER_ADDR'];
@@ -124,30 +124,38 @@ class API implements \JSONSerializable
 	{
 		return [
 			'callbacks' => $this->_callbacks,
-			'method'    => $this->method,
-			'url'       => $this->url,
-			'request'   => $_REQUEST,
-			'headers'   => $this->headers,
-			'cookies'   => $this->cookies,
-			'session'   => $this->session,
-			'files'     => $this->files,
-			'options'   => $this->options,
+			'method'        => $this->method,
+			'url'           => $this->url,
+			'get'           => $this->get,
+			'post'          => $this->post,
+			'headers'       => $this->headers,
+			'accept'        => $this->accept,
+			'referrer'      => $this->referrer,
+			'userAgent'     => $this->useragent,
+			'cookies'       => $this->cookies,
+			'files'         => $this->files,
+			'options'       => $this->options,
+			'DNT'           => $this->dnt,
+			'remoteAddress' => $this->remoteAddress,
 		];
 	}
 
 	final public function jsonSerialize(): array
 	{
 		return [
-			'method'    => $this->method,
-			'url'       => $this->url,
-			'request'   => $_REQUEST,
-			'get'       => $this->get,
-			'post'      => $this->post,
-			'headers'   => $this->headers,
-			'cookies'   => $this->cookies,
-			'files'     => $this->files,
-			'options'   => $this->options,
-			'DNT'       => $this->dnt,
+			'method'        => $this->method,
+			'url'           => $this->url,
+			'get'           => $this->get,
+			'post'          => $this->post,
+			'headers'       => $this->headers,
+			'accept'        => $this->accept,
+			'referrer'      => $this->referrer,
+			'userAgent'     => $this->useragent,
+			'cookies'       => $this->cookies,
+			'files'         => $this->files,
+			'options'       => $this->options,
+			'DNT'           => $this->dnt,
+			'remoteAddress' => $this->remoteAddress,
 		];
 	}
 
