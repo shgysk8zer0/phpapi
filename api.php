@@ -6,6 +6,7 @@ use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\{HTTPException, Headers, URL};
 use \Exception;
+use \StdClass;
 
 class API implements \JSONSerializable
 {
@@ -52,7 +53,7 @@ class API implements \JSONSerializable
 			case 'contenttype': return $_SERVER['CONTENT_TYPE'] ?? null;
 			case 'cookies': return Cookies::getInstance();
 			case 'dnt': return array_key_exists('HTTP_DNT', $_SERVER) and ! empty($_SERVER['HTTP_DNT']);
-			case 'files': return array_keys($_FILES);
+			case 'files': return $this->_files();
 			case 'get': return GetData::getInstance();
 			case 'headers': return getallheaders();
 			case 'https': return $this->_url->protocol === 'https:';
@@ -221,7 +222,55 @@ class API implements \JSONSerializable
 		return array_key_exists($key, $_FILES);
 	}
 
-	final public function redirect(URL $url, bool $permenant)
+	final private function _files(): StdClass
+	{
+		static $files = null;
+
+		if (is_null($files)) {
+			$files = new \StdClass();
+			foreach ($_FILES as $key => $file) {
+				$obj = new StdClass();
+				if ($file['error'] !== UPLOAD_ERR_OK) {
+					switch ($file['error']) {
+						case  UPLOAD_ERR_INI_SIZE:
+						case UPLOAD_ERR_FORM_SIZE:
+							$obj->error = new HTTPException('File too large', HTTP::PAYLOAD_TOO_LARGE);
+							break;
+						case UPLOAD_ERR_PARTIAL:
+							$obj->error = new HTTPException('File partially uploaded', HTTP::BAD_REQUEST);
+							break;
+						case UPLOAD_ERR_NO_FILE:
+							$obj->error - new HTTPException('No file uploaded', HTTP::BAD_REQUEST);
+							break;
+						case UPLOAD_ERR_NO_TMP_DIR:
+							$obj->error = new HTTPException('No temporary directory for uploads', HTTP::INTERNAL_SERVER_ERROR);
+							break;
+						case UPLOAD_ERR_CANT_WRITE:
+							$obj->error = new HTTPException('Cannot write to tmp dir', HTTP::INTERNAL_SERVER_ERROR);
+							break;
+						case UPLOAD_ERR_EXTENSION:
+							$obj->error = new HTTPException('An extension blocked upload', HTTP::INTERNAL_SERVER_ERROR);
+							break;
+						default:
+							$obj->error = new HTTPException('An unknown error occured uploading the file', HTTP::INTERNAL_SERVER_ERROR);
+					}
+				} else {
+					$obj->error = null;
+				}
+
+				$obj->name = $file['name'];
+				$obj->tmpName = $file['tmp_name'];
+				$obj->type = $file['type'];
+				$obj->size = $file['size'];
+				$obj->ext = pathinfo($obj->name, PATHINFO_EXTENSION);
+				$obj->md5 = is_null($obj->error) ? md5_file($obj->tmpName) : null;
+				$files->{$key} = $obj;
+			}
+		}
+		return $files;
+	}
+
+	final public function redirect(URL $url, bool $permenant = false)
 	{
 		Headers::redirect($url, $permenant);
 	}
