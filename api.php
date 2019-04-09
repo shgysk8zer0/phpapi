@@ -71,6 +71,8 @@ class API implements \JSONSerializable
 			case 'servername': return $_SERVER['SERVER_NAME'];
 			case 'session': return Session::getInstance();
 			case 'url': return $this->_url;
+			case 'upgradeinsecurerequests': return array_key_exists('HTTP_UPGRADE_INSECURE_REQUESTS', $_SERVER)
+				and $_SERVER['HTTP_UPGRADE_INSECURE_REQUESTS'] === '1';
 			case 'useragent': return $_SERVER['HTTP_USER_AGENT'] ?? null;
 			default: throw new \Exception(sprintf('Unknown property: %s', $prop));
 		}
@@ -123,39 +125,41 @@ class API implements \JSONSerializable
 	final public function __debugInfo(): array
 	{
 		return [
-			'callbacks' => $this->_callbacks,
-			'method'        => $this->method,
-			'url'           => $this->url,
-			'get'           => $this->get,
-			'post'          => $this->post,
-			'headers'       => $this->headers,
-			'accept'        => $this->accept,
-			'referrer'      => $this->referrer,
-			'userAgent'     => $this->useragent,
-			'cookies'       => $this->cookies,
-			'files'         => $this->files,
-			'options'       => $this->options,
-			'DNT'           => $this->dnt,
-			'remoteAddress' => $this->remoteAddress,
+			'callbacks'               => $this->_callbacks,
+			'method'                  => $this->method,
+			'url'                     => $this->url,
+			'get'                     => $this->get,
+			'post'                    => $this->post,
+			'headers'                 => $this->headers,
+			'accept'                  => $this->accept,
+			'referrer'                => $this->referrer,
+			'userAgent'               => $this->useragent,
+			'cookies'                 => $this->cookies,
+			'files'                   => $this->files,
+			'options'                 => $this->options,
+			'DNT'                     => $this->dnt,
+			'upgradeInsecureRequests' => $this->upgradeInsecureRequests,
+			'remoteAddress'           => $this->remoteAddress,
 		];
 	}
 
 	final public function jsonSerialize(): array
 	{
 		return [
-			'method'        => $this->method,
-			'url'           => $this->url,
-			'get'           => $this->get,
-			'post'          => $this->post,
-			'headers'       => $this->headers,
-			'accept'        => $this->accept,
-			'referrer'      => $this->referrer,
-			'userAgent'     => $this->useragent,
-			'cookies'       => $this->cookies,
-			'files'         => $this->files,
-			'options'       => $this->options,
-			'DNT'           => $this->dnt,
-			'remoteAddress' => $this->remoteAddress,
+			'method'                  => $this->method,
+			'url'                     => $this->url,
+			'get'                     => $this->get,
+			'post'                    => $this->post,
+			'headers'                 => $this->headers,
+			'accept'                  => $this->accept,
+			'referrer'                => $this->referrer,
+			'userAgent'               => $this->useragent,
+			'cookies'                 => $this->cookies,
+			'files'                   => $this->files,
+			'options'                 => $this->options,
+			'DNT'                     => $this->dnt,
+			'upgradeInsecureRequests' => $this->upgradeInsecureRequests,
+			'remoteAddress'           => $this->remoteAddress,
 		];
 	}
 

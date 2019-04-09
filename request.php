@@ -2,7 +2,7 @@
 namespace shgysk8zer0\PHPAPI;
 use \shgysk8zer0\PHPAPI\Traits\{cURL};
 
-class Request
+class Request implements \JSONSerializable
 {
 	use cURL;
 
@@ -17,6 +17,16 @@ class Request
 		$this->setMethod($method);
 		$this->setHeaders($headers);
 		$this->setParams($params);
+	}
+
+	public function jsonSerialize(): array
+	{
+		return [
+			'url'     => $this->_url,
+			'method'  => $this->_method,
+			'headers' => $this->_headers,
+			'body'    => $this->_body,
+		];
 	}
 
 	final public function send(): \StdClass
