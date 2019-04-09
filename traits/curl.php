@@ -4,6 +4,7 @@ use \Exception;
 use \InvalidArgumentException;
 use \StdClass;
 use \CURLFile;
+use \shgysk8zer0\PHPAPI\{URL};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 
 trait cURL
@@ -61,7 +62,7 @@ trait cURL
 		}
 	}
 
-	final protected function _send(): StdClass
+	final protected function _send(bool $assoc = false): StdClass
 	{
 		if (isset($this->_url)) {
 			$ch = curl_init();
@@ -107,14 +108,15 @@ trait cURL
 			$resp->headers = new StdClass();
 
 			if ($result !== false) {
-				$resp->url = urldecode(curl_getinfo($ch, CURLINFO_EFFECTIVE_URL));
+				$resp->url = new URL(curl_getinfo($ch, CURLINFO_EFFECTIVE_URL));
 				$resp->status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 				$resp->headers->{'Content-Type'} = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 				$resp->headers->{'Content-Length'} = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-				$resp->ok = $resp->status === HTTP::OK;
+				$resp->ok = $resp->status >= 200 && $resp->status <= 299;
+
 				switch (strtolower($resp->headers->{'Content-Type'})) {
 					case 'application/json':
-						$data = json_decode($result);
+						$data = json_decode($result, $assoc);
 						$resp->body = $data;
 						break;
 					case 'text/plain':

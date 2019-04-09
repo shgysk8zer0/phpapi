@@ -35,7 +35,7 @@ final class FormData implements \JSONSerializable, \Iterator
 
 	}
 
-	final public function get(string $key, bool $escape = true): string
+	final public function get(string $key, bool $escape = true)
 	{
 		if (! $this->has($key)) {
 			return '';
@@ -58,12 +58,12 @@ final class FormData implements \JSONSerializable, \Iterator
 		return $has;
 	}
 
-	final public function __invoke(string $key, bool $escape = true): string
+	final public function __invoke(string $key, bool $escape = true)
 	{
 		return $this->get($key, $escape);
 	}
 
-	final public function __get(string $key): string
+	final public function __get(string $key)
 	{
 		return $this->get($key, static::$_escape);
 	}
