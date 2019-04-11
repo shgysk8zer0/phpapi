@@ -6,16 +6,77 @@ use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 trait FileUtils
 {
 	private $_file_path = '';
+	private $_fhandle = null;
+	private $_flocked = false;
 
 	final public function isUploadFile(): bool
 	{
-		Headers::set('X-Path', $this->_file_path);
 		return is_uploaded_file($this->_file_path);
 	}
 
 	final public function exists(): bool
 	{
 		return $this->_file_path !== '' && @file_exists($this->_file_path);
+	}
+
+	final public function isLocked(): bool
+	{
+		return $this->_flocked;
+	}
+
+	final public function openFile(): bool
+	{
+		if ($this->exists() and ! $this->isOpen()) {
+			$this->_fhandle = fopen($this->_file_path);
+			return $this->isOpen();
+		} else {
+			return false;
+		}
+	}
+
+	final public function closeFile(bool $unlock_if_locked = true): bool
+	{
+		if (! $this->exists()) {
+			return false;
+		} elseif ($unlock_if_locked and ($this->isLocked() and ! $this->unlockFile())) {
+			return false;
+		} elseif (! fclose($this->_fhandle)) {
+			return false;
+		} else {
+			$this->_fhandle = null;
+			return true;
+		}
+	}
+
+	final public function isOpen(): bool
+	{
+		return is_resource($this->_fhandle);
+	}
+
+	final public function lockFile(): bool
+	{
+		if (! $this->exists()) {
+			return false;
+		} elseif ($this->isLocked()) {
+			return false;
+		} elseif ($this->isOpen() or $this->openFile()) {
+			$this->_flocked = flock($this->_fhandle, LOCK_EX);
+			return $this->isLocked();
+		} else {
+			return false;
+		}
+	}
+
+	final public function unlockFile(): bool
+	{
+		if ($this->isLocked()) {
+			if ($this->isOpen() and flock($this->_fhandle, LOCK_UN)) {
+				$this->_flocked = false;
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	final public function saveAs(string $path, $allow_override = false, $perms = 0666): bool
@@ -37,6 +98,16 @@ trait FileUtils
 		} else {
 			return false;
 		}
+	}
+
+	final public function fileSize(): int
+	{
+		return filesize($this->_file_path) ?? 0;
+	}
+
+	final public function fileMimeType(): string
+	{
+		return mime_content_type($this->_file_path);
 	}
 
 	final public function md5(): string
