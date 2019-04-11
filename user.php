@@ -4,7 +4,8 @@ namespace shgysk8zer0\PHPAPI;
 
 use \DateTime;
 use \PDO;
-use \shgysk8zer0\PHPAPI\Token;
+use \shgysk8zer0\PHPAPI\{Token, HTTPException};
+use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 
 final class User implements \JsonSerializable
 {
@@ -31,6 +32,8 @@ final class User implements \JsonSerializable
 	private $_pdo      = null;
 
 	private $_token    = null;
+
+	private $_pwned    = null;
 
 	private static $_key = null;
 
@@ -61,6 +64,8 @@ final class User implements \JsonSerializable
 					$this->_token = "{$token}";
 				}
 				return $this->_token;
+			case 'pwned':
+				return $this->_pwned;
 			default:
 				throw new \InvalidArgumentException(sprintf('Undefined or invalid property: "%s"', $key));
 		}
@@ -69,12 +74,13 @@ final class User implements \JsonSerializable
 	final public function __debugInfo(): array
 	{
 		return [
-			'id'       => $this->_id,
-			'username' => $this->_username,
-			'created'  => $this->_created,
-			'updated'  => $this->_updated,
-			'loggedIn' => $this->_loggedIn,
-			'hash'     => $this->_hash,
+			'id'       => $this->id,
+			'username' => $this->username,
+			'created'  => $this->created,
+			'updated'  => $this->updated,
+			'loggedIn' => $this->loggedIn,
+			'hash'     => $this->hash,
+			'pwned'    => $this->pwned,
 		];
 	}
 
@@ -87,13 +93,14 @@ final class User implements \JsonSerializable
 	{
 		if ($this->loggedIn) {
 			return [
-				'id'       => $this->_id,
-				'username' => $this->_username,
+				'id'       => $this->id,
+				'username' => $this->username,
 				'token'    => $this->token,
-				'created'  => $this->_created->format(DateTime::W3C),
-				'updated'  => $this->_updated->format(DateTime::W3C),
+				'created'  => $this->created->format(DateTime::W3C),
+				'updated'  => $this->updated->format(DateTime::W3C),
 				'loggedIn' => $this->loggedIn,
 				'isAdmin'  => $this->isAdmin(),
+				'pwned'    => $this->pwned,
 			];
 		} else {
 			return [
@@ -153,7 +160,7 @@ final class User implements \JsonSerializable
 		if ($stm->execute()) {
 			$user = $stm->fetchObject();
 			if (isset($user->hash) and password_verify($password, $user->hash)) {
-
+				$this->_pwned = static::haveIBeenPwned($password);
 				$this->_username = $username;
 				$this->_created = new DateTime($user->created);
 				$this->_updated = new DateTime($user->updated);
@@ -196,7 +203,7 @@ final class User implements \JsonSerializable
 
 	final public function isAdmin(): bool
 	{
-		return $_SERVER['SERVER_NAME'] === 'localhost';
+		return $this->id === 1;
 	}
 
 	final public function create(string $username, string $password): bool
@@ -264,7 +271,7 @@ final class User implements \JsonSerializable
 				return false;
 			}
 		} else {
-			return false;
+			throw new HTTPException('Cannot change password when not logged in', HTTP::UNAUTHORIZED);
 		}
 	}
 
@@ -297,6 +304,21 @@ final class User implements \JsonSerializable
 	final public static function setKey(string $key)
 	{
 		static::$_key = $key;
+	}
+
+	final public static function haveIBeenPwned(string $pwd): bool
+	{
+		$hash   = strtoupper(sha1($pwd));
+		$prefix = substr($hash, 0, 5);
+		$rest   = substr($hash, 5);
+		$req    = new Request("https://api.pwnedpasswords.com/range/{$prefix}");
+		$resp   = $req->send();
+
+		if ($resp->ok) {
+			return strpos($resp->body, "{$rest}:") !== false;
+		} else {
+			return false;
+		}
 	}
 
 	final static public function loadFromToken(PDO $pdo, string $token): self
