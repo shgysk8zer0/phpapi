@@ -19,7 +19,7 @@ class File implements \JSONSerializable
 	{
 		if (array_key_exists($key, $_FILES)) {
 			$this->_parse($_FILES[$key]);
-			if (! empty($allowed_types) and ! $this->_isAllowedType(...$allowed_types)) {
+			if ($this->valid() and ! empty($allowed_types) and ! $this->_isAllowedType(...$allowed_types)) {
 				$this->_error = new HTTPException(sprintf('File type "%s" not allowed (%s)', $this->type, $this->name), HTTP::UNSUPPORTED_MEDIA_TYPE);
 			}
 		}
