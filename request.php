@@ -29,8 +29,8 @@ class Request implements \JSONSerializable
 		];
 	}
 
-	final public function send(): \StdClass
+	final public function send(bool $assoc = false): \StdClass
 	{
-		return $this->_send();
+		return $this->_send($assoc);
 	}
 }
