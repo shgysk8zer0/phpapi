@@ -84,14 +84,15 @@ class File implements \JSONSerializable
 
 	final private function _parse(array $file)
 	{
+		$name = empty($file['name']) ? 'File' : sprintf('"%s"', $file['name']);
 		if ($file['error'] !== UPLOAD_ERR_OK) {
 			switch ($file['error']) {
 				case  UPLOAD_ERR_INI_SIZE:
 				case UPLOAD_ERR_FORM_SIZE:
-					$this->_error = new HTTPException("File exceeds maximum size of {$this->maxUploadSize}", HTTP::PAYLOAD_TOO_LARGE);
+					$this->_error = new HTTPException("{$name} exceeds maximum size of {$this->maxUploadSize}", HTTP::PAYLOAD_TOO_LARGE);
 					break;
 				case UPLOAD_ERR_PARTIAL:
-					$this->_error = new HTTPException('File partially uploaded', HTTP::BAD_REQUEST);
+					$this->_error = new HTTPException("{$name} partially uploaded", HTTP::BAD_REQUEST);
 					break;
 				case UPLOAD_ERR_NO_FILE:
 					$this->_error = new HTTPException('No file uploaded', HTTP::BAD_REQUEST);
@@ -103,10 +104,10 @@ class File implements \JSONSerializable
 					$this->_error = new HTTPException('Cannot write to tmp dir', HTTP::INTERNAL_SERVER_ERROR);
 					break;
 				case UPLOAD_ERR_EXTENSION:
-					$this->_error = new HTTPException('An extension blocked upload', HTTP::INTERNAL_SERVER_ERROR);
+					$this->_error = new HTTPException("An extension blocked upload of {$name}", HTTP::INTERNAL_SERVER_ERROR);
 					break;
 				default:
-					$this->_error = new HTTPException('An unknown error occured uploading the file', HTTP::INTERNAL_SERVER_ERROR);
+					$this->_error = new HTTPException("An unknown error occured uploading {$name}", HTTP::INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			$this->_name     = $file['name'];
