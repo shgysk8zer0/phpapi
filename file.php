@@ -31,7 +31,7 @@ class File implements \JSONSerializable
 			case 'type': return $this->_type;
 			case 'error': return $this->_error;
 			case 'path': return $this->_path;
-			case 'saved': $this->valid() && ! is_uploaded_file($this->tmpName);
+			case 'saved': return $this->valid() && ! is_uploaded_file($this->tmpName);
 			case 'hash': return $this->valid() ? $this->{self::DEFAULT_HASH_ALGO} : null;
 			case 'md5': return $this->valid() ? $this->md5() : null;
 			case 'ext': return $this->valid() ? pathinfo($this->name, PATHINFO_EXTENSION) : null;
@@ -45,6 +45,10 @@ class File implements \JSONSerializable
 				} else {
 					return null;
 				}
+			case 'maxUploadSize':
+				$upload_max_filesize = ini_get('upload_max_filesize') ?? 0;
+				$post_max_size = ini_get('post_max_size') ?? 0;
+				return intval($upload_max_filesize) > intval($post_max_size) ? "{$post_max_size}b" : "{$upload_max_filesize}b";
 		}
 	}
 
@@ -84,7 +88,7 @@ class File implements \JSONSerializable
 			switch ($file['error']) {
 				case  UPLOAD_ERR_INI_SIZE:
 				case UPLOAD_ERR_FORM_SIZE:
-					$this->_error = new HTTPException('File too large', HTTP::PAYLOAD_TOO_LARGE);
+					$this->_error = new HTTPException("File exceeds maximum size of {$this->maxUploadSize}", HTTP::PAYLOAD_TOO_LARGE);
 					break;
 				case UPLOAD_ERR_PARTIAL:
 					$this->_error = new HTTPException('File partially uploaded', HTTP::BAD_REQUEST);
