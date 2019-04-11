@@ -12,12 +12,13 @@ final class Files implements JSONSerializable,  Iterator
 	use Singleton;
 	private $_files = [];
 	private $_path = '';
+	private static $_allowed_types = [];
 
 	final private function __construct()
 	{
 		foreach($_FILES as $key => $file) {
 			if (is_array($file) and array_key_exists('error', $file) and $file['error'] !== UPLOAD_ERR_NO_FILE) {
-				$this->_files[$key] = new File($key);
+				$this->_files[$key] = new File($key, ...static::$_allowed_types);
 			}
 		}
 	}
@@ -50,7 +51,7 @@ final class Files implements JSONSerializable,  Iterator
 	 * @param void
 	 * @return mixed Whatever the current value is
 	 */
-	public function current()
+	final public function current(): File
 	{
 		return $this->_files[$this->key()];
 	}
@@ -61,7 +62,7 @@ final class Files implements JSONSerializable,  Iterator
 	 * @param void
 	 * @return mixed  Probably a string, but could be an integer.
 	 */
-	public function key()
+	final public function key()
 	{
 		return key($this->_files);
 	}
@@ -72,7 +73,7 @@ final class Files implements JSONSerializable,  Iterator
 	 * @param void
 	 * @return void
 	 */
-	public function next()
+	final public function next()
 	{
 		next($this->_files);
 	}
@@ -83,7 +84,7 @@ final class Files implements JSONSerializable,  Iterator
 	 * @param void
 	 * @return void
 	 */
-	public function rewind()
+	final public function rewind()
 	{
 		reset($this->_files);
 	}
@@ -94,7 +95,7 @@ final class Files implements JSONSerializable,  Iterator
 	 * @param void
 	 * @return bool Whether or not there is data set at current position
 	 */
-	public function valid(): bool
+	final public function valid(): bool
 	{
 		return $this->key() !== null;
 	}
@@ -107,8 +108,13 @@ final class Files implements JSONSerializable,  Iterator
 	 * @example $cookies->keys() (['test', ...])
 	 * @deprecated
 	 */
-	public function keys(): array
+	final public function keys(): array
 	{
 		return array_keys($this->_files);
+	}
+
+	final public static function setAllowedTypes(string ...$allowed_types)
+	{
+		static::$_allowed_types = $allowed_types;
 	}
 }

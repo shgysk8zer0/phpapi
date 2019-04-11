@@ -15,10 +15,13 @@ class File implements \JSONSerializable
 
 	const DEFAULT_HASH_ALGO = 'md5';
 
-	final public function __construct(string $key)
+	final public function __construct(string $key, string ...$allowed_types)
 	{
 		if (array_key_exists($key, $_FILES)) {
 			$this->_parse($_FILES[$key]);
+			if (! empty($allowed_types) and ! $this->_isAllowedType(...$allowed_types)) {
+				$this->_error = new HTTPException(sprintf('File type "%s" not allowed (%s)', $this->type, $this->name), HTTP::UNSUPPORTED_MEDIA_TYPE);
+			}
 		}
 	}
 
@@ -70,6 +73,11 @@ class File implements \JSONSerializable
 			'ext'      => $this->ext,
 			'url'      => $this->url,
 		];
+	}
+
+	final private function _isAllowedType(string ... $types): bool
+	{
+		return in_array('*/*', $types) or in_array($this->type, $types);
 	}
 
 	final public function hasError(): bool
