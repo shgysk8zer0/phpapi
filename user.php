@@ -6,6 +6,7 @@ use \DateTime;
 use \PDO;
 use \shgysk8zer0\PHPAPI\{Token, HTTPException};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
+use \shgysk8zer0\PHPAPI\Schema\{Person};
 use \Throwable;
 use \JsonSerializable;
 
@@ -23,11 +24,7 @@ final class User implements JsonSerializable
 
 	private $_username = null;
 
-	private $_given_name = null;
-
-	private $_additional_name = null;
-
-	private $_family_name = null;
+	private $_person   = null;
 
 	private $_role     = null;
 
@@ -45,13 +42,15 @@ final class User implements JsonSerializable
 
 	private $_pwned    = null;
 
-	private $_perms    = [];
+	private $_permissions = [];
 
 	private static $_key = null;
 
 	final public function __construct(PDO $pdo)
 	{
 		$this->_pdo = $pdo;
+		Person::setPDO($pdo);
+		$this->_person = new Person();
 	}
 
 	final public function __get(string $key)
@@ -60,10 +59,11 @@ final class User implements JsonSerializable
 			case 'id': return $this->_id;
 			case 'username': return $this->_username;
 			case 'role': return $this->_role;
-			case 'perms': return $this->_perms;
+			case 'permissions': return $this->_permissions;
 			case 'loggedIn': return $this->_loggedIn;
 			case 'created': return $this->_created;
 			case 'updated': return $this->_updated;
+			case 'person': return $this->_person;
 			case 'token':
 				if (is_null($this->_token) and isset(static::$_key) and $this->loggedIn) {
 					$token = new Token();
@@ -110,7 +110,8 @@ final class User implements JsonSerializable
 				'loggedIn' => $this->loggedIn,
 				'isAdmin'  => $this->isAdmin(),
 				'pwned'    => $this->pwned,
-				'perms'    => $this->perms,
+				'permissions'    => $this->permissions,
+				'person'   => $this->person,
 			];
 		} else {
 			return [
@@ -122,7 +123,8 @@ final class User implements JsonSerializable
 				'updated'  => null,
 				'loggedIn' => false,
 				'isAdmin'  => false,
-				'perms'    => [],
+				'permissions'    => [],
+				'person'   => $this->person,
 			];
 		}
 	}
@@ -130,23 +132,14 @@ final class User implements JsonSerializable
 	final public function setUser(int $id): bool
 	{
 		$stm = $this->_pdo->prepare(
-			'SELECT `users`.`username`,
+			'SELECT `Person`.`email` AS `username`,
 				`users`.`password` AS `hash`,
 				`users`.`created`,
 				`users`.`updated`,
+				`users`.`person`,
 				`roles`.`name` AS `role`,
 				`roles`.`debug`,
-				`roles`.`upload`,
-				`Person`.`gender`,
-				`Person`.`honorificPrefix`,
-				`Person`.`givenName`,
-				`Person`.`additionalName`,
-				`Person`.`familyName`,
-				`Person`.`honorificSuffix`,
-				`Person`.`email`,
-				`Person`.`telephone`,
-				`Person`.`birthDate`,
-				`Person`.`postalAddress`
+				`roles`.`upload`
 			FROM `users`
 			JOIN `roles` ON `users`.`role` = `roles`.`id`
 			JOIN `Person` ON `users`.`person` = `Person`.`id`
@@ -157,16 +150,15 @@ final class User implements JsonSerializable
 		$stm->bindValue(':id', $id);
 
 		if ($stm->execute() and $data = $stm->fetchObject()) {
-			Headers::contentType('application/json');
-			exit(json_encode($data));
 			$this->_id = $id;
 			$this->_username = $data->username;
 			$this->_role = $data->role;
 			$this->_created = new DateTime($data->created);
 			$this->_updated = new DateTime($data->updated);
+			$this->_person = new Person($data->person);
 			$this->_hash = $data->hash;
 			$this->_loggedIn = true;
-			$this->_perms = [
+			$this->_permissions = [
 				'debug' => $data->debug === '1',
 				'upload' => $data->upload === '1',
 			];
