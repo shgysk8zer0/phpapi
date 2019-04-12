@@ -1,18 +1,15 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 
-class Person extends Thing
+class Organization extends Thing
 {
-	const TYPE = 'Person';
+	const TYPE = 'Organization';
 
 	protected function _setData(\StdClass $data)
 	{
 		$data->id = intval($data->id);
 		if (isset($data->address)) {
 			$data->address = new PostalAddress($data->address);
-		}
-		if (isset($data->worksFor)) {
-			$data->worksFor = new Organization($data->worksFor);
 		}
 		$this->_setDataObject($data);
 	}
