@@ -6,8 +6,10 @@ use \DateTime;
 use \PDO;
 use \shgysk8zer0\PHPAPI\{Token, HTTPException};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
+use \Throwable;
+use \JsonSerializable;
 
-final class User implements \JsonSerializable
+final class User implements JsonSerializable
 {
 	const PASSWORD_ALGO = PASSWORD_DEFAULT;
 
@@ -20,6 +22,8 @@ final class User implements \JsonSerializable
 	private $_id       = null;
 
 	private $_username = null;
+
+	private $_role     = null;
 
 	private $_created  = null;
 
@@ -35,6 +39,8 @@ final class User implements \JsonSerializable
 
 	private $_pwned    = null;
 
+	private $_perms    = [];
+
 	private static $_key = null;
 
 	final public function __construct(PDO $pdo)
@@ -45,16 +51,13 @@ final class User implements \JsonSerializable
 	final public function __get(string $key)
 	{
 		switch($key) {
-			case 'id':
-				return $this->_id;
-			case 'username':
-				return $this->_username;
-			case 'loggedIn':
-				return $this->_loggedIn;
-			case 'created':
-				return $this->_created;
-			case 'updated':
-				return $this->_updated;
+			case 'id': return $this->_id;
+			case 'username': return $this->_username;
+			case 'role': return $this->_role;
+			case 'perms': return $this->_perms;
+			case 'loggedIn': return $this->_loggedIn;
+			case 'created': return $this->_created;
+			case 'updated': return $this->_updated;
 			case 'token':
 				if (is_null($this->_token) and isset(static::$_key) and $this->loggedIn) {
 					$token = new Token();
@@ -64,8 +67,7 @@ final class User implements \JsonSerializable
 					$this->_token = "{$token}";
 				}
 				return $this->_token;
-			case 'pwned':
-				return $this->_pwned;
+			case 'pwned': return $this->_pwned;
 			default:
 				throw new \InvalidArgumentException(sprintf('Undefined or invalid property: "%s"', $key));
 		}
@@ -95,22 +97,26 @@ final class User implements \JsonSerializable
 			return [
 				'id'       => $this->id,
 				'username' => $this->username,
+				'role'     => $this->role,
 				'token'    => $this->token,
 				'created'  => $this->created->format(DateTime::W3C),
 				'updated'  => $this->updated->format(DateTime::W3C),
 				'loggedIn' => $this->loggedIn,
 				'isAdmin'  => $this->isAdmin(),
 				'pwned'    => $this->pwned,
+				'perms'    => $this->perms,
 			];
 		} else {
 			return [
 				'id'       => null,
 				'username' => null,
+				'role'     => null,
 				'token'    => null,
 				'created'  => null,
 				'updated'  => null,
 				'loggedIn' => false,
 				'isAdmin'  => false,
+				'perms'    => [],
 			];
 		}
 	}
@@ -118,26 +124,34 @@ final class User implements \JsonSerializable
 	final public function setUser(int $id): bool
 	{
 		$stm = $this->_pdo->prepare(
-			'SELECT `id`, `username`, `password` AS `hash`, `created`, `updated`
+			'SELECT `users`.`username`,
+				`users`.`password` AS `hash`,
+				`users`.`created`,
+				`users`.`updated`,
+				`roles`.`name` AS `role`,
+				`roles`.`debug`,
+				`roles`.`upload`
 			FROM `users`
-			WHERE `id` = :id
+			LEFT JOIN `roles` ON `users`.`role` = `roles`.`id`
+			WHERE `users`.`id` = :id
 			LIMIT 1;'
 		);
+
 		$stm->bindValue(':id', $id);
 
-		if ($stm->execute()) {
-			$data = $stm->fetchObject();
-			if (! isset($data->id)) {
-				return false;
-			} else {
-				$this->_id = intval($data->id);
-				$this->_username = $data->username;
-				$this->_created = new DateTime($data->created);
-				$this->_updated = new DateTime($data->updated);
-				$this->_hash = $data->hash;
-				$this->_loggedIn = true;
-				return true;
-			}
+		if ($stm->execute() and $data = $stm->fetchObject()) {
+			$this->_id = $id;
+			$this->_username = $data->username;
+			$this->_role = $data->role;
+			$this->_created = new DateTime($data->created);
+			$this->_updated = new DateTime($data->updated);
+			$this->_hash = $data->hash;
+			$this->_loggedIn = true;
+			$this->_perms = [
+				'debug' => $data->debug === '1',
+				'upload' => $data->upload === '1',
+			];
+			return true;
 		} else {
 			return false;
 		}
@@ -146,13 +160,7 @@ final class User implements \JsonSerializable
 	final public function login(string $username, string $password): bool
 	{
 		$stm = $this->_pdo->prepare(
-			'SELECT `id`,
-				`password` AS `hash`,
-				`created`,
-				`updated`
-			FROM `users`
-			WHERE `username` = :username
-			LIMIT 1;'
+			'SELECT `id`, `password` AS `hash` FROM`users` WHERE `username` = :username LIMIT 1;'
 		);
 
 		$stm->bindValue(':username', $username);
@@ -160,17 +168,10 @@ final class User implements \JsonSerializable
 		if ($stm->execute()) {
 			$user = $stm->fetchObject();
 			if (isset($user->hash) and password_verify($password, $user->hash)) {
-				$this->_pwned = static::haveIBeenPwned($password);
-				$this->_username = $username;
-				$this->_created = new DateTime($user->created);
-				$this->_updated = new DateTime($user->updated);
-				$this->_loggedIn = true;
-				$this->_id = intval($user->id);
-				$this->_hash = $user->hash;
-
 				if ($this->passwordNeedsUpdate()) {
 					$this->changePassword($password);
 				}
+				$this->setUser($user->id);
 				return true;
 			} else {
 				$this->logout();
@@ -190,6 +191,8 @@ final class User implements \JsonSerializable
 			$this->_created = null;
 			$this->_updated = null;
 			$this->_loggedIn = false;
+			$this->_role = 'guest';
+			$this->_perms = [];
 			return true;
 		} else {
 			return false;
@@ -203,7 +206,7 @@ final class User implements \JsonSerializable
 
 	final public function isAdmin(): bool
 	{
-		return $this->id === 1;
+		return $this->role === 'admin';
 	}
 
 	final public function create(string $username, string $password): bool
@@ -228,12 +231,7 @@ final class User implements \JsonSerializable
 			$id = intval($this->_pdo->lastInsertId());
 
 			if ($id !== 0) {
-				$this->_id = $id;
-				$this->_username = $username;
-				$this->_created = new DateTime();
-				$this->_loggedIn = true;
-				$this->_updated = $this->_created;
-				$this->_hash = $hash;
+				$this->setUser($id);
 				return true;
 			} else {
 				return false;
