@@ -23,6 +23,12 @@ final class User implements JsonSerializable
 
 	private $_username = null;
 
+	private $_given_name = null;
+
+	private $_additional_name = null;
+
+	private $_family_name = null;
+
 	private $_role     = null;
 
 	private $_created  = null;
@@ -130,9 +136,20 @@ final class User implements JsonSerializable
 				`users`.`updated`,
 				`roles`.`name` AS `role`,
 				`roles`.`debug`,
-				`roles`.`upload`
+				`roles`.`upload`,
+				`Person`.`gender`,
+				`Person`.`honorificPrefix`,
+				`Person`.`givenName`,
+				`Person`.`additionalName`,
+				`Person`.`familyName`,
+				`Person`.`honorificSuffix`,
+				`Person`.`email`,
+				`Person`.`telephone`,
+				`Person`.`birthDate`,
+				`Person`.`postalAddress`
 			FROM `users`
-			LEFT JOIN `roles` ON `users`.`role` = `roles`.`id`
+			JOIN `roles` ON `users`.`role` = `roles`.`id`
+			JOIN `Person` ON `users`.`person` = `Person`.`id`
 			WHERE `users`.`id` = :id
 			LIMIT 1;'
 		);
@@ -140,6 +157,8 @@ final class User implements JsonSerializable
 		$stm->bindValue(':id', $id);
 
 		if ($stm->execute() and $data = $stm->fetchObject()) {
+			Headers::contentType('application/json');
+			exit(json_encode($data));
 			$this->_id = $id;
 			$this->_username = $data->username;
 			$this->_role = $data->role;
