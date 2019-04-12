@@ -25,7 +25,13 @@ trait Schema
 
 	final protected function _setDataObject(\StdClass $data)
 	{
-		$this->_data = get_object_vars($data);
+		$vars = get_object_vars($data);
+		foreach ($vars as $key => $value) {
+			if (is_null($value)) {
+				unset($vars[$key]);
+			}
+		}
+		$this->_data = $vars;
 	}
 
 	public function jsonSerialize(): array
