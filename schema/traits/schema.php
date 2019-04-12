@@ -30,7 +30,8 @@ trait Schema
 
 	public function jsonSerialize(): array
 	{
-		$data = ['@context' => $this::CONTEXT, '@type' => $this::TYPE];
-		return array_merge($data, $this->_data);
+		$data = $this->_data;
+		unset($data['created'], $data['updated'], $data['id']);
+		return array_merge(['@context' => $this::CONTEXT, '@type' => $this::TYPE], $data);
 	}
 }

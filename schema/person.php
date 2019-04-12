@@ -8,8 +8,8 @@ class Person extends Thing
 	protected function _setData(\StdClass $data)
 	{
 		$data->id = intval($data->id);
-		if (isset($data->postalAddress)) {
-			$data->postalAddress = new PostalAddress($data->postalAddress);
+		if (isset($data->address)) {
+			$data->address = new PostalAddress($data->address);
 		}
 		$this->_setDataObject($data);
 	}
