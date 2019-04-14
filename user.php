@@ -171,7 +171,12 @@ final class User implements JsonSerializable
 	final public function login(string $username, string $password): bool
 	{
 		$stm = $this->_pdo->prepare(
-			'SELECT `id`, `password` AS `hash` FROM`users` WHERE `username` = :username LIMIT 1;'
+			'SELECT `users`.`id`,
+				`users`.`password` AS `hash`
+			FROM `Person`
+			JOIN `users` ON `Person`.`id` = `users`.`person`
+			WHERE `Person`.`email` = :username
+			LIMIT 1;'
 		);
 
 		$stm->bindValue(':username', $username);
