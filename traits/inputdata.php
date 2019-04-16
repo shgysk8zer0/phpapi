@@ -1,46 +1,28 @@
 <?php
-namespace shgysk8zer0\PHPAPI;
+namespace shgysk8zer0\PHPAPI\Traits;
 
-final class FormData implements \JSONSerializable, \Iterator
+trait InputData
 {
-	use Traits\Singleton;
-
 	private static $_escape = true;
-	private static $_data = [];
 
-	final public function __construct()
+	protected static $_data = [];
+
+	final protected static function _setInputData(array $inputs = [])
 	{
-		if (array_key_exists('CONTENT_TYPE', $_SERVER)) {
-			switch (strtolower($_SERVER['CONTENT_TYPE'])) {
-				case 'application/json':
-				case 'text/json':
-					static::$_data = json_decode(file_get_contents('php://input'), true);
-					break;
-				case 'application/csp-report':
-					$report = json_decode(file_get_contents('php://input'), true);
-					if (array_key_exists('csp-report', $report)) {
-						static::$_data = $report['csp-report'];
-					}
-					break;
-				case 'text/plain':
-				case 'application/text':
-					static::$_data = ['text' => file_get_contents('php://input')];
-					break;
-				default:
-					static::$_data = $_POST;
-			}
-		} else {
-			static::$_data = $_POST;
-		}
-
+		static::$_data = $inputs;
 	}
 
-	final public function get(string $key, bool $escape = true)
+	final public function get(
+		string $key,
+		bool   $escape  = true,
+		string $default = null,
+		string $charset = 'UTF-8'
+	)
 	{
 		if (! $this->has($key)) {
-			return '';
+			return $default;
 		} elseif ($escape) {
-			return htmlentities(static::$_data[$key]);
+			return htmlspecialchars(static::$_data[$key], ENT_COMPAT | ENT_HTML5, $charset);
 		} else {
 			return static::$_data[$key];
 		}

@@ -2,7 +2,7 @@
 namespace shgysk8zer0\PHPAPI\Schema\Abstracts;
 
 use \JSONSerializable;
-use \shgysk8zer0\PHPAPI\{PDO, URL};
+use \shgysk8zer0\PHPAPI\{PDO, URL, Headers};
 use \shgysk8zer0\PHPAPI\Schema\Interfaces\{Schema as SchemaInterface};
 use \shgysk8zer0\PHPAPI\Schema\Traits\{Schema as SchemaTrait};
 
@@ -32,7 +32,18 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 
 	final public function __get(string $prop)
 	{
-		return $this->_data[$prop] ?? null;
+		if (function_exists([$this, 'get' . ucfirst($prop)])) {
+			call_user_func([$this, 'get' . ucfirst($prop)]);
+		} else {
+			return $this->_data[$prop] ?? null;
+		}
+	}
+
+	final public function __set(string $prop, $value)
+	{
+		if (function_exists([$this, 'set' . ucfirst($prop)])) {
+			call_user_func([$this, 'set' . ucfirst($prop)], $value);
+		}
 	}
 
 	final public function getScript(): string
@@ -48,6 +59,11 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 	final public static function getSchemaURL(): string
 	{
 		return new URL(static::TYPE, static::CONTEXT);
+	}
+
+	final public static function openSchemaDocs()
+	{
+		Headers::redirect(static::getSchemaURL());
 	}
 
 	final protected function _init(int $id): \StdClass

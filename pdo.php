@@ -54,6 +54,30 @@ class PDO extends \PDO
 		}
 	}
 
+	final public function insert(string $table, array $values): int
+	{
+		$keys = array_map(function(string $key): string
+		{
+			return "`{$key}`";
+		}, array_keys($values));
+
+		$vals = array_map(function(string $key): string
+		{
+			return ":{$key}";
+		}, array_keys($values));
+
+		$sql = sprintf(
+			'INSERT INTO `%s` (%s) VALUES (%s);',
+			$table,
+			join(', ', $keys),
+			join(', ', $vals)
+		);
+
+		$stm = $this->prepare($sql);
+		$stm->execute(array_combine($vals, array_values($values)));
+		return $this->lastInsertId();
+	}
+
 	final public static function setCredsFile(string $creds_file)
 	{
 		static::$_creds_file = $creds_file;
