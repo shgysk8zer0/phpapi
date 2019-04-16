@@ -13,25 +13,23 @@ class API implements \JSONSerializable
 	use CORS;
 	use Validate;
 
-	const DEFAULT_METHODS = [
-		'HEAD',
-		'OPTIONS',
-		'GET',
-		'POST',
-		'DELETE',
-	];
-
 	private $_callbacks = [];
+
 	private $_url = null;
 
-	final public function __construct(string $origin = '*')
-	{
-		static::allowOrigin($origin);
-		$this->_url = URL::getRequestUrl();
+	private $_origin_error = null;
 
-		if ($origin !== '*' and $this->origin !== $origin) {
-			throw new HTTPException('Origin not allowed', HTTP::FORBIDDEN);
+	private $_allowed_origins = ['*'];
+
+	private $_allow_credentials = false;
+
+	final public function __construct(string ...$allow_origins)
+	{
+		if (! empty($allow_origins)) {
+			$this->_allowed_origins = $allow_origins;
 		}
+
+		$this->_url = URL::getRequestUrl();
 
 		$this->on('OPTIONS', function()
 		{
@@ -59,8 +57,8 @@ class API implements \JSONSerializable
 			case 'https': return $this->_url->protocol === 'https:';
 			case 'method': return $_SERVER['REQUEST_METHOD'] ?? 'GET';
 			case 'options': return array_keys($this->_callbacks);
-			case 'origin': return $this->_url->origin;
-			case 'post': return FormData::getInstance();
+			case 'origin': return array_key_exists('HTTP_ORIGIN', $_SERVER) ? $_SERVER['HTTP_ORIGIN'] : null;
+			case 'post': return PostData::getInstance();
 			case 'remoteaddr':
 			case 'remoteaddress': return $_SERVER['REMOTE_ADDR'] ?? null;
 			case 'remotehost': return $_SERVER['REMOTE_HOST'] ?? null;
@@ -104,17 +102,30 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __invoke()
+	final public function __invoke(...$args)
 	{
 		$method = $this->method;
 		static::allowMethods(...$this->options);
 
-		$args = func_get_args();
-		array_unshift($args, $this);
+		if (in_array($this->origin, $this->_allowed_origins)) {
+			static::allowOrigin($this->origin);
+			if ($this->_allow_credentials) {
+				static::allowCredentials(true);
+			}
+		} elseif (in_array('*', $this->_allowed_origins)) {
+			if ($this->_allow_credentials === true and $this->origin !== null) {
+				static::allowCredentials(true);
+				static::allowOrigin($this->origin);
+			} else {
+				static::allowOrigin('*');
+			}
+		} else {
+			throw new HTTPException("{$this->origin} not allowed", HTTP::FORBIDDEN);
+		}
 
 		if (array_key_exists($method, $this->_callbacks)) {
 			foreach ($this->_callbacks[$method] as $callback) {
-				call_user_func_array($callback, $args);
+				call_user_func($callback, $this, ...$args);
 			}
 		} else {
 			static::set('Allow', join(', ', $this->options));
@@ -133,6 +144,7 @@ class API implements \JSONSerializable
 			'post'                    => $this->post,
 			'headers'                 => $this->headers,
 			'accept'                  => $this->accept,
+			'origin'                  => $this->origin,
 			'referrer'                => $this->referrer,
 			'userAgent'               => $this->useragent,
 			'cookies'                 => $this->cookies,
@@ -153,6 +165,7 @@ class API implements \JSONSerializable
 			'post'                    => $this->post,
 			'headers'                 => $this->headers,
 			'accept'                  => $this->accept,
+			'origin'                  => $this->origin,
 			'referrer'                => $this->referrer,
 			'userAgent'               => $this->useragent,
 			'cookies'                 => $this->cookies,
@@ -162,6 +175,11 @@ class API implements \JSONSerializable
 			'upgradeInsecureRequests' => $this->upgradeInsecureRequests,
 			'remoteAddress'           => $this->remoteAddress,
 		];
+	}
+
+	final public function credentials(bool $allow_credentials = true)
+	{
+		$this->_allow_credentials = $allow_credentials;
 	}
 
 	final public function on(string $method, callable $callback)

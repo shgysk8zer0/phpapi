@@ -4,6 +4,12 @@ namespace shgysk8zer0\PHPAPI\Schema;
 class Person extends Thing
 {
 	const TYPE = 'Person';
+	use Traits\Search;
+
+	final public static function searchByFamilyName(string $name, int $limit = 10, int $offset = 0): array
+	{
+		return static::_simpleSearch('familyName', $name, $limit, $offset);
+	}
 
 	protected function _setData(\StdClass $data)
 	{

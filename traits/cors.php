@@ -10,7 +10,7 @@ trait CORS
 	final public static function allowCredentials(bool $allow = true)
 	{
 		if ($allow) {
-			static::set('Access-Control-Allow-Credentials', true);
+			static::set('Access-Control-Allow-Credentials', 'true');
 		} else {
 			static::delete('Access-Control-Allow-Credentials');
 		}

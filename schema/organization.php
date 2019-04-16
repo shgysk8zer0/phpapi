@@ -5,6 +5,8 @@ class Organization extends Thing
 {
 	const TYPE = 'Organization';
 
+	use Traits\Search;
+
 	protected function _setData(\StdClass $data)
 	{
 		$data->id = intval($data->id);
