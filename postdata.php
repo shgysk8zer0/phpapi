@@ -21,6 +21,7 @@ class PostData implements \JSONSerializable, \Iterator
 					}
 					break;
 				case 'text/plain':
+				case 'text/ping':
 				case 'application/text':
 					static::_setInputData(['text' => file_get_contents('php://input')]);
 					break;
