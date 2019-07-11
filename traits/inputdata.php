@@ -31,6 +31,7 @@ trait InputData
 	final public function has(string ...$keys): bool
 	{
 		$has = true;
+
 		foreach ($keys as $key) {
 			if (! array_key_exists($key, static::$_data)) {
 				$has = false;

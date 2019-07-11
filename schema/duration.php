@@ -23,7 +23,7 @@ class Duration
 
 	final public function __toString(): string
 	{
-		return "{$this->_from->format($this->_format)} - {$this->_thru->format($this->_format}";
+		return "{$this->_from->format($this->_format)} - {$this->_thru->format($this->_format)}";
 	}
 
 	final public function getFrom(): DateTime

@@ -1,7 +1,7 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-final class GetData implements \JSONSerializable, \Iterator
+final class GetData implements \JSONSerializable, \Iterator, Interfaces\InputData
 {
 	use Traits\Singleton;
 	use Traits\InputData;

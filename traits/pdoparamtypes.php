@@ -3,7 +3,7 @@
 namespace shgysk8zer0\PHPAPI\Traits;
 use \PDO;
 
-Trait PDOParamTypes
+trait PDOParamTypes
 {
 	final public static function getParamType($thing): int
 	{
