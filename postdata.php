@@ -1,7 +1,7 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-class PostData implements \JSONSerializable, \Iterator
+class PostData implements \JSONSerializable, \Iterator, Interfaces\InputData
 {
 	use Traits\Singleton;
 	use Traits\InputData;
