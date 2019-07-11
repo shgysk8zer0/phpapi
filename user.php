@@ -4,9 +4,11 @@ namespace shgysk8zer0\PHPAPI;
 
 use \DateTime;
 use \PDO;
-use \shgysk8zer0\PHPAPI\{Token, HTTPException};
+use \shgysk8zer0\PHPAPI\{Token, HTTPException, PostData, Headers};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\Schema\{Person};
+use \Exception;
+use \InvalidArgumentException;
 use \Throwable;
 use \JsonSerializable;
 
@@ -75,7 +77,7 @@ final class User implements JsonSerializable
 				return $this->_token;
 			case 'pwned': return $this->_pwned;
 			default:
-				throw new \InvalidArgumentException(sprintf('Undefined or invalid property: "%s"', $key));
+				throw new InvalidArgumentException(sprintf('Undefined or invalid property: "%s"', $key));
 		}
 	}
 
@@ -225,35 +227,60 @@ final class User implements JsonSerializable
 		return $this->role === 'admin';
 	}
 
-	final public function create(string $username, string $password): bool
+	final public function create(PostData $input): bool
 	{
-		$stm = $this->_pdo->prepare(
-			'INSERT INTO `users` (
-				`username`,
-				`password`
-			) VALUES (
-				:username,
-				:password
-			);'
-		);
-
-		$hash = password_hash($password, self::PASSWORD_ALGO, self::PASSWORD_OPTS);
-		$datetime = new DateTime('now');
-		$stm->bindValue(':username', $username);
-		$stm->bindValue(':password', $hash);
+		$this->_pdo->beginTransaction();
 
 		try {
-			$stm->execute();
-			$id = intval($this->_pdo->lastInsertId());
+			$user = $this->_pdo->prepare('INSERT INTO `users` (
+				`person`,
+				`password`
+			) VALUES (
+				:person,
+				:password
+			);');
 
-			if ($id !== 0) {
+			$person = $this->_pdo->prepare('INSERT INTO `Person` (
+				`givenName`,
+				`additionalName`,
+				`familyName`,
+				`email`,
+				`birthDate`
+			) VALUES (
+				:givenName,
+				:additionalName,
+				:familyName,
+				:email,
+				:birthDate
+			);');
+
+			if (! $person->execute([
+				':givenName'      => $input->get('givenName'),
+				':additionalName' => $input->get('additionalName', true, null),
+				':familyName'     => $input->get('familyName'),
+				':email'          => $input->get('email'),
+				':birthDate'      => $input->get('birthDate', true, null),
+			])) {
+				throw new HTTPException('Error creating `Person`');
+			} elseif (! $user->execute([
+				':password' => password_hash($input->get('password', false), self::PASSWORD_ALGO, self::PASSWORD_OPTS),
+				':person'   => $this->_pdo->lastInsertId(),
+			])) {
+				throw new HTTPException('Error creating `user`');
+			} elseif ($id = intval($this->_pdo->lastInsertId()) and $id === 0) {
+				throw new HTTPException('Created `user` with `id` of 0 or null');
+			} elseif (! $this->_pdo->commit()) {
+				throw new HTTPException('Error commiting the `user` transaction');
+			} else {
 				$this->setUser($id);
 				return true;
-			} else {
-				return false;
 			}
-		} catch (\Throwable $e) {
-			return false;
+		} catch (Throwable $e) {
+			if ($this->_pdo->inTransaction()) {
+				$this->_pdo->rollback();
+			}
+
+			throw $e;
 		}
 	}
 
