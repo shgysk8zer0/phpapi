@@ -1,17 +1,46 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 use \shgysk8zer0\PHPAPI\Schema\{PostalAddress};
 use \DateTime;
 
 class Person extends Thing
 {
 	const TYPE = 'Person';
+
 	use Traits\Search;
 
 	final public static function searchByFamilyName(string $name, int $limit = 10, int $offset = 0): array
 	{
 		return static::_simpleSearch('familyName', $name, $limit, $offset);
+	}
+
+	public static function create(InputData $input): self
+	{
+		$person = new self();
+
+		$person->setName($input->get('givenName'));
+
+		if ($input->has('additionalName')) {
+			$person->setAdditionalName($input->get('additionalName'));
+		}
+
+		$person->setFamilyName($input->get('familyName'));
+
+		if ($input->has('email')) {
+			$person->setEmail($input->get('email'));
+		}
+
+		if ($input->has('telephone')) {
+			$person->setTelephone($input->get('telephone'));
+		}
+
+		if ($input->has('birthDate')) {
+			$person->set('birthDate', new DateTime($input->get('birthDate')));
+		}
+
+		return $person;
 	}
 
 	protected function _setData(\StdClass $data)
