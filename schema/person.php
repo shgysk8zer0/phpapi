@@ -1,6 +1,9 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 
+use \shgysk8zer0\PHPAPI\Schema\{PostalAddress};
+use \DateTime;
+
 class Person extends Thing
 {
 	const TYPE = 'Person';
@@ -14,12 +17,63 @@ class Person extends Thing
 	protected function _setData(\StdClass $data)
 	{
 		$data->id = intval($data->id);
+
 		if (isset($data->address)) {
 			$data->address = new PostalAddress($data->address);
 		}
+
 		if (isset($data->worksFor)) {
 			$data->worksFor = new Organization($data->worksFor);
 		}
+
+		if (isset($data->image)) {
+			$data->image = new ImageObject($data->image);
+		}
+
 		$this->_setDataObject($data);
+	}
+
+	public function setGivenName(string $first)
+	{
+		$this->_set('givenName', $first);
+	}
+
+	public function setAdditionalName(string $middle)
+	{
+		$this->_set('additionalName', $middle);
+	}
+
+	public function setFamilyName(string $last)
+	{
+		$this->_set('familyName', $last);
+	}
+
+	public function setEmail(string $email)
+	{
+		if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			$this->_set('email', $email);
+		} else {
+			throw new \InvalidArgumentException(sprintf('"%s" is not a valid email address', $email));
+		}
+	}
+
+	public function setWorksFor(Organization $org)
+	{
+		$this->_set('worksFor', $org);
+	}
+
+	public function setTelephone(string $phone)
+	{
+		$this->_set('telephone', $phone);
+	}
+
+	public function setAddress(PostalAddress $addr)
+	{
+		$this->_set('address', $addr);
+	}
+
+	public function setBirthDate(DateTime $bday)
+	{
+		$this->_set('birthDate', $bday->format('Y-m-d'));
 	}
 }

@@ -10,7 +10,7 @@ class Thing extends Abstracts\Schema
 		return $this->_get('description');
 	}
 
-	final public function setDescription(string $description): string
+	final public function setDescription(string $description)
 	{
 		$this->_set('description', $description);
 	}
@@ -38,6 +38,16 @@ class Thing extends Abstracts\Schema
 	public function delete(): bool
 	{
 		return true;
+	}
+
+	public function setImage(ImageObject $img)
+	{
+		$this->_set('image', $img);
+	}
+
+	public function getImage(): ImageObject
+	{
+		return $this->_get('image');
 	}
 
 	protected function _setData(\StdClass $data)
