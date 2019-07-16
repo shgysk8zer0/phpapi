@@ -44,18 +44,34 @@ class Organization extends Thing
 	{
 		$data->id = intval($data->id);
 
-		if (isset($data->address)) {
-			$data->address = new PostalAddress($data->address);
+		$this->setName($data->name);
+
+		if (isset($data->description)) {
+			$this->setDescription($data->description);
 		}
 
-		if (isset($data->logo)) {
-			$data->logo = new ImageObject($data->logo);
+		if (isset($data->address)) {
+			$this->setAddress(new PostalAddress($data->address));
+		}
+
+		if (isset($data->email)) {
+			$this->setEmail($data->email);
+		}
+
+		if (isset($data->telephone)) {
+			$this->setTelephone($data->telephone);
+		}
+
+		if (isset($data->faxNumber)) {
+			$this->setFaxNumber($data->faxNumber);
 		}
 
 		if (isset($data->image)) {
-			$data->image = new ImageObject($data->image);
+			$this->setImage(new ImageObject($data->image));
 		}
 
-		$this->_setDataObject($data);
+		if (isset($data->logo)) {
+			$this->setLogo(new ImageObject($data->logo));
+		}
 	}
 }
