@@ -54,4 +54,30 @@ class Event extends Thing
 	{
 		$this->_set('organizer', $organizer);
 	}
+
+	final public static function searchDateRange(DateTime $from, string $range = '+1 month', int $limit = 30, int $page = 1): array
+	{
+		$sql = sprintf('SELECT `id`
+			FROM `Event`
+			WHERE `startDate`
+			BETWEEN TIMESTAMP(:start) AND TIMESTAMP(:end)
+			ORDER BY `startDate`
+			ASC LIMIT %d, %d;',
+		($page - 1) * $limit, $limit);
+
+		$start = $from->format(DateTime::W3C);
+		$from->modify($range);
+		$end = $from->format(DateTime::W3C);
+		$stm = static::$_pdo->prepare($sql);
+
+		$stm->execute([
+			':start' => $start,
+			':end'   => $end,
+		]);
+
+		return array_map(function(\StdClass $result): self
+		{
+			return new self($result->id);
+		}, $stm->fetchAll());
+	}
 }

@@ -1,6 +1,8 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema\Traits;
 use \shgysk8zer0\PHPAPI\{PDO};
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
+use \shgysk8zer0\PHPAPI\Schema\{Thing};
 
 trait Schema
 {
@@ -11,6 +13,11 @@ trait Schema
 	final public static function setPDO(PDO $pdo)
 	{
 		static::$_pdo = $pdo;
+	}
+
+	public static function create(InputData $input): Thing
+	{
+		return new self();
 	}
 
 	final protected function _get(string $key)

@@ -3,6 +3,7 @@ namespace shgysk8zer0\PHPAPI\Schema\Abstracts;
 
 use \JSONSerializable;
 use \shgysk8zer0\PHPAPI\{PDO, URL, Headers};
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 use \shgysk8zer0\PHPAPI\Schema\Interfaces\{Schema as SchemaInterface};
 use \shgysk8zer0\PHPAPI\Schema\Traits\{Schema as SchemaTrait};
 

@@ -16,7 +16,7 @@ class Person extends Thing
 		return static::_simpleSearch('familyName', $name, $limit, $offset);
 	}
 
-	public static function create(InputData $input): self
+	public static function create(InputData $input): Thing
 	{
 		$person = new self();
 

@@ -1,6 +1,8 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
+
 class Thing extends Abstracts\Schema
 {
 	const TYPE = 'Thing';
@@ -28,11 +30,6 @@ class Thing extends Abstracts\Schema
 	final public function setName(string $name)
 	{
 		$this->_set('name', $name);
-	}
-
-	public function create(): bool
-	{
-		return true;
 	}
 
 	public function delete(): bool
