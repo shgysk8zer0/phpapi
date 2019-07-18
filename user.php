@@ -4,7 +4,7 @@ namespace shgysk8zer0\PHPAPI;
 
 use \DateTime;
 use \PDO;
-use \shgysk8zer0\PHPAPI\{Token, HTTPException, Headers};
+use \shgysk8zer0\PHPAPI\{Token, HTTPException, Headers, URL};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 use \shgysk8zer0\PHPAPI\Schema\{Person};
@@ -258,29 +258,55 @@ final class User implements JsonSerializable
 				:password
 			);');
 
+			$img = $this->_pdo->prepare('INSERT INTO `ImageObject` (
+				`url`,
+				`width`,
+				`height`,
+				`encodingFormat`
+			) VALUES (
+				:url,
+				:width,
+				:height,
+				:encodingFormat
+			);');
+
+			$url = new URL(sprintf('https://secure.gravatar.com/avatar/%s', md5($input->get('username'))));
+			$url->searchParams->set('s', 64);
+			$url->searchParams->set('d', 'mm');
+
 			$person = $this->_pdo->prepare('INSERT INTO `Person` (
 				`givenName`,
 				`additionalName`,
 				`familyName`,
 				`email`,
-				`birthDate`
+				`birthDate`,
+				`image`
 			) VALUES (
 				:givenName,
 				:additionalName,
 				:familyName,
 				:email,
-				:birthDate
+				:birthDate,
+				:image
 			);');
 
-			if (! $person->execute([
+			if (! $img->execute([
+				':url'            => "{$url}",
+				':height'         => $url->searchParams->get('s'),
+				':width'          => $url->searchParams->get('s'),
+				':encodingFormat' => 'image/jpeg',
+			])) {
+				throw new HTTPException('Error creating user image', HTTP::INTERNAL_SERVER_ERROR);
+			} elseif (! $person->execute([
 				':givenName'      => $input->get('givenName'),
 				':additionalName' => $input->get('additionalName', true, null),
 				':familyName'     => $input->get('familyName'),
 				':email'          => $input->get('username'),
 				':birthDate'      => $input->get('birthDate', true, null),
+				':image'          => $this->_pdo->lastInsertId(),
 			])) {
 				throw new HTTPException('Error creating `Person`');
-			} elseif (! $user->execute([
+			}  elseif (! $user->execute([
 				':password' => password_hash($input->get('password', false), self::PASSWORD_ALGO, self::PASSWORD_OPTS),
 				':person'   => $this->_pdo->lastInsertId(),
 			])) {
