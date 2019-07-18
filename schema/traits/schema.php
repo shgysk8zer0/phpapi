@@ -14,6 +14,14 @@ trait Schema
 
 	protected $_uuid = '';
 
+	public function __debugInfo(): array
+	{
+		$this->_data;
+		$data['id'] = $this->_id;
+		$data['uuid'] = $this->_uuid;
+		return $data;
+	}
+
 	final protected function _setId(int $id)
 	{
 		$this->_id = $id;

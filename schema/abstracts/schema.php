@@ -21,7 +21,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 	public function __construct(int $id = null)
 	{
 		if (isset($id)) {
-			if ($data = $this->_init($id)) {
+			if ($data = $this->_init($id) and isset($data->id)) {
 				$this->_setData($data);
 			}
 		}

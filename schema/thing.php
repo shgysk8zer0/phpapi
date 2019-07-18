@@ -45,11 +45,7 @@ class Thing extends Abstracts\Schema
 	public static function create(InputData $input): self
 	{
 		$thing = new self();
-		$this->_setUuid(static::generateUuid());
-
-		if ($input->has('image')) {
-			$thing->setImage(new ImageObject($input->get('image')));
-		}
+		$thing->_setUuid(static::generateUuid());
 
 		if ($input->has('name')) {
 			$thing->setName($input->get('name'));
@@ -59,12 +55,26 @@ class Thing extends Abstracts\Schema
 			$thing->setDescription($input->get('description'));
 		}
 
+		if ($input->has('image')) {
+			$thing->setImage(new ImageObject($input->get('image')));
+		}
+
 		return $thing;
 	}
 
 	protected function _setData(\StdClass $data)
 	{
-		$data->id = intval($data->id);
+		if (isset($data->name)) {
+			$this->setName($data->name);
+		}
+
+		if (isset($data->description)) {
+			$this->setDescrption($data->description);
+		}
+
+		if (isset($data->image)) {
+			$this->setImage(new ImageObject($data->image));
+		}
 		$this->_setDataObject($data);
 	}
 }
