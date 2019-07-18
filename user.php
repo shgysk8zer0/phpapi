@@ -140,31 +140,34 @@ final class User implements JsonSerializable
 				`users`.`created`,
 				`users`.`updated`,
 				`users`.`person`,
-				`roles`.`name` AS `role`,
-				`roles`.`debug`,
-				`roles`.`upload`
+				`users`.`role`
 			FROM `users`
-			JOIN `roles` ON `users`.`role` = `roles`.`id`
 			JOIN `Person` ON `users`.`person` = `Person`.`id`
 			WHERE `users`.`id` = :id
 			LIMIT 1;'
 		);
 
+		$perms_stm = $this->_pdo->prepare('SELECT * FROM `roles` WHERE `id` = :role LIMIT 1;');
+
 		$stm->bindValue(':id', $id);
 
 		if ($stm->execute() and $data = $stm->fetchObject()) {
+			$perms_stm->execute([':role' => $data->role]);
+			$perms = $perms_stm->fetchObject();
+			$this->_role = $perms->name;
+			$perms = get_object_vars($perms);
+			unset($perms['id'], $perms['name']);
 			$this->_id = $id;
 			$this->_username = $data->username;
-			$this->_role = $data->role;
 			$this->_created = new DateTime($data->created);
 			$this->_updated = new DateTime($data->updated);
 			$this->_person = new Person($data->person);
 			$this->_hash = $data->hash;
 			$this->_loggedIn = true;
-			$this->_permissions = [
-				'debug' => $data->debug === '1',
-				'upload' => $data->upload === '1',
-			];
+			$this->_permissions = array_map(function(string $val): bool
+			{
+				return $val === '1';
+			}, $perms);
 			return true;
 		} else {
 			return false;
@@ -226,6 +229,20 @@ final class User implements JsonSerializable
 	final public function isAdmin(): bool
 	{
 		return $this->role === 'admin';
+	}
+
+	public function can(string ...$perms): bool
+	{
+		$can = true;
+
+		foreach ($perms as $perm) {
+			if ($this->_permissions[$perm] !== true) {
+				$can = false;
+				break;
+			}
+		}
+
+		return $can;
 	}
 
 	final public function create(InputData $input): bool

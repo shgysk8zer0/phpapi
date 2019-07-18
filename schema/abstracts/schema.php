@@ -2,15 +2,14 @@
 namespace shgysk8zer0\PHPAPI\Schema\Abstracts;
 
 use \JSONSerializable;
-use \shgysk8zer0\PHPAPI\{PDO, URL, Headers};
+use \shgysk8zer0\PHPAPI\{PDO, URL, Headers, UUID};
 use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 use \shgysk8zer0\PHPAPI\Schema\Interfaces\{Schema as SchemaInterface};
-use \shgysk8zer0\PHPAPI\Schema\Traits\{Schema as SchemaTrait, UUID};
+use \shgysk8zer0\PHPAPI\Schema\Traits\{Schema as SchemaTrait};
 
 abstract class Schema implements JSONSerializable, SchemaInterface
 {
 	use SchemaTrait;
-	use UUID;
 
 	const CONTEXT = 'https://schema.org/';
 
@@ -48,14 +47,23 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		}
 	}
 
-	final public function getScript(): string
-	{
-		return sprintf('<script type="%s">%s</script>', self::CONTENT_TYPE, json_encode($this));
-	}
-
 	final public function __toString(): string
 	{
 		return $this->getScript();
+	}
+
+	final public function getScript(): string
+	{
+		return sprintf(
+			'<script type="%s">%s</script>',
+			self::CONTENT_TYPE,
+			json_encode($this)
+		);
+	}
+
+	final public static function generateUuid(): string
+	{
+		return new UUID();
 	}
 
 	final public static function getSchemaURL(): string
