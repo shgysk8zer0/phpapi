@@ -8,7 +8,7 @@ class GeoCoordinates extends \shgysk8zer0\PHPAPI\Schema\Abstracts\Intangible
 
 	protected function _setData(\StdClass $data)
 	{
-		$data->id = intval($data->id);
+		$this->_setId($data->id);
 
 		$this->setLongitude($data->longitude);
 		$this->setLatitude($data->latitude);

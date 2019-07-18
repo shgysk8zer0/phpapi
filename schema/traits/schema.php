@@ -10,6 +10,30 @@ trait Schema
 
 	protected $_data = [];
 
+	protected $_id = 0;
+
+	protected $_uuid = '';
+
+	final protected function _setId(int $id)
+	{
+		$this->_id = $id;
+	}
+
+	final protected function _setUuid(string $uuid)
+	{
+		$this->_uuid = $uuid;
+	}
+
+	final protected function getUuid(): string
+	{
+		return $this->_uuid;
+	}
+
+	final protected function _getId(): int
+	{
+		return $this->_id;
+	}
+
 	final public static function setPDO(PDO $pdo)
 	{
 		static::$_pdo = $pdo;
@@ -18,6 +42,22 @@ trait Schema
 	public static function create(InputData $input): Thing
 	{
 		return new self();
+	}
+
+	public function delete(): bool
+	{
+		if ($this->_getId() !== 0) {
+			$sql = sprintf('DELETE FROM `%s` WHERE `id` = :id LIMIT 1;', $this::TYPE);
+			$stm = $this->_pdo->prepare($sql);
+
+			if ($stm->execute([':id' => $this->_getId()])) {
+				return $stm->rowCount() === 1;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	final protected function _get(string $key)

@@ -6,29 +6,31 @@ class PostData implements \JSONSerializable, \Iterator, Interfaces\InputData
 	use Traits\Singleton;
 	use Traits\InputData;
 
-	final public function __construct()
+	final public function __construct(array $data = null)
 	{
-		if (array_key_exists('CONTENT_TYPE', $_SERVER)) {
+		if (isset($data)) {
+			$this->_setInputData($data);
+		} elseif (array_key_exists('CONTENT_TYPE', $_SERVER)) {
 			switch (strtolower($_SERVER['CONTENT_TYPE'])) {
 				case 'application/json':
 				case 'text/json':
-					static::_setInputData(json_decode(file_get_contents('php://input'), true));
+					$this->_setInputData(json_decode(file_get_contents('php://input'), true));
 					break;
 				case 'application/csp-report':
 					$report = json_decode(file_get_contents('php://input'), true);
 					if (array_key_exists('csp-report', $report)) {
-						static::_setInputData($report['csp-report']);
+						$this->_setInputData($report['csp-report']);
 					}
 					break;
 				case 'text/plain':
 				case 'application/text':
-					static::_setInputData(['text' => file_get_contents('php://input')]);
+					$this->_setInputData(['text' => file_get_contents('php://input')]);
 					break;
 				default:
-					static::_setInputData($_POST);
+					$this->_setInputData($_POST);
 			}
 		} else {
-			static::_setInputData($_POST);
+			$this->_setInputData($_POST);
 		}
 	}
 }

@@ -10,7 +10,8 @@ class Event extends Thing
 
 	protected function _setData(StdClass $data)
 	{
-		$data->id = intval($data->id);
+		$this->_setId($data->id);
+		$this->_set('guid', static::generateUuid());
 		$this->setName($data->name);
 		$this->setStartDate(new DateTime($data->startDate));
 

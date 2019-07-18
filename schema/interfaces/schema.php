@@ -10,5 +10,7 @@ interface Schema
 
 	public function delete(): bool;
 
+	public static function generateUuid(): string;
+
 	public static function setPDO(PDO $pdo);
 }

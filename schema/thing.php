@@ -19,7 +19,7 @@ class Thing extends Abstracts\Schema
 
 	final public function getId(): int
 	{
-		return $this->_get('id');
+		return $this->_getId();
 	}
 
 	final public function getName(): string
@@ -32,11 +32,6 @@ class Thing extends Abstracts\Schema
 		$this->_set('name', $name);
 	}
 
-	public function delete(): bool
-	{
-		return true;
-	}
-
 	public function setImage(ImageObject $img)
 	{
 		$this->_set('image', $img);
@@ -45,6 +40,26 @@ class Thing extends Abstracts\Schema
 	public function getImage(): ImageObject
 	{
 		return $this->_get('image');
+	}
+
+	public static function create(InputData $input): self
+	{
+		$thing = new self();
+		$this->_setUuid(static::generateUuid());
+
+		if ($input->has('image')) {
+			$thing->setImage(new ImageObject($input->get('image')));
+		}
+
+		if ($input->has('name')) {
+			$thing->setName($input->get('name'));
+		}
+
+		if ($input->has('description')) {
+			$thing->setDescription($input->get('description'));
+		}
+
+		return $thing;
 	}
 
 	protected function _setData(\StdClass $data)

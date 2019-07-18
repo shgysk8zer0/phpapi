@@ -7,6 +7,8 @@ class PostalAddress extends Thing
 
 	protected function _setData(\StdClass $data)
 	{
+		$this->_setId($data->id);
+
 		if (isset($data->streetAddress)) {
 			$this->setStreetAddress($data->streetAddress);
 		}

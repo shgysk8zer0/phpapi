@@ -9,7 +9,7 @@ class ImageObject extends Thing
 
 	protected function _setData(\StdClass $data)
 	{
-		$data->id = intval($data->id);
+		$this->_setId($data->id);
 		$this->setUrl($data->url);
 
 		if (isset($data->height)) {
