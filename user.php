@@ -276,7 +276,7 @@ final class User implements JsonSerializable
 				':givenName'      => $input->get('givenName'),
 				':additionalName' => $input->get('additionalName', true, null),
 				':familyName'     => $input->get('familyName'),
-				':email'          => $input->get('email'),
+				':email'          => $input->get('username'),
 				':birthDate'      => $input->get('birthDate', true, null),
 			])) {
 				throw new HTTPException('Error creating `Person`');
