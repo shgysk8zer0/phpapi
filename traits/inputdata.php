@@ -5,11 +5,20 @@ trait InputData
 {
 	private static $_escape = true;
 
-	protected static $_data = [];
+	protected $_data = [];
 
-	final protected static function _setInputData(array $inputs = [])
+	final protected function _setInputData(array $inputs = [])
 	{
-		static::$_data = $inputs;
+		$this->_data = array_map(function($val)
+		{
+			if (is_array($val)) {
+				return new self($val);
+			} elseif (is_object($val)) {
+				return new self(get_object_vars($val));
+			} else {
+				return $val;
+			}
+		}, $inputs);
 	}
 
 	final public function get(
@@ -21,10 +30,12 @@ trait InputData
 	{
 		if (! $this->has($key)) {
 			return $default;
+		} elseif ($this->_data[$key] instanceof self) {
+			return $this->_data[$key];
 		} elseif ($escape) {
-			return htmlspecialchars(static::$_data[$key], ENT_COMPAT | ENT_HTML5, $charset);
+			return htmlspecialchars($this->_data[$key], ENT_COMPAT | ENT_HTML5, $charset);
 		} else {
-			return static::$_data[$key];
+			return $this->_data[$key];
 		}
 	}
 
@@ -33,7 +44,7 @@ trait InputData
 		$has = true;
 
 		foreach ($keys as $key) {
-			if (! array_key_exists($key, static::$_data)) {
+			if (! array_key_exists($key, $this->_data)) {
 				$has = false;
 				break;
 			}
@@ -41,9 +52,9 @@ trait InputData
 		return $has;
 	}
 
-	final public function __invoke(string $key, bool $escape = true)
+	final public function __invoke(...$args)
 	{
-		return $this->get($key, $escape);
+		return $this->get(...$args);
 	}
 
 	final public function __get(string $key)
@@ -58,12 +69,12 @@ trait InputData
 
 	final public function __debugInfo(): array
 	{
-		return static::$_data;
+		return $this->_data;
 	}
 
 	final public function jsonSerialize(): array
 	{
-		return static::$_data;
+		return $this->_data;
 	}
 
 	/**
@@ -85,7 +96,7 @@ trait InputData
 	 */
 	public function key()
 	{
-		return key(static::$_data);
+		return key($this->_data);
 	}
 
 	/**
@@ -96,7 +107,7 @@ trait InputData
 	 */
 	public function next()
 	{
-		next(static::$_data);
+		next($this->_data);
 	}
 
 	/**
@@ -107,7 +118,7 @@ trait InputData
 	 */
 	public function rewind()
 	{
-		reset(static::$_data);
+		reset($this->_data);
 	}
 
 	/**
@@ -131,7 +142,7 @@ trait InputData
 	 */
 	public function keys(): array
 	{
-		return array_keys(static::$_data);
+		return array_keys($this->_data);
 	}
 
 	final public static function setEscape(bool $escape)

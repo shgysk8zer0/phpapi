@@ -6,8 +6,8 @@ final class GetData implements \JSONSerializable, \Iterator, Interfaces\InputDat
 	use Traits\Singleton;
 	use Traits\InputData;
 
-	final public function __construct()
+	final public function __construct(array $data = null)
 	{
-		static::_setInputData($_GET);
+		$this->_setInputData(isset($data) ? $data : $_GET);
 	}
 }

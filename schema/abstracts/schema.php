@@ -3,12 +3,14 @@ namespace shgysk8zer0\PHPAPI\Schema\Abstracts;
 
 use \JSONSerializable;
 use \shgysk8zer0\PHPAPI\{PDO, URL, Headers};
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 use \shgysk8zer0\PHPAPI\Schema\Interfaces\{Schema as SchemaInterface};
-use \shgysk8zer0\PHPAPI\Schema\Traits\{Schema as SchemaTrait};
+use \shgysk8zer0\PHPAPI\Schema\Traits\{Schema as SchemaTrait, UUID};
 
 abstract class Schema implements JSONSerializable, SchemaInterface
 {
 	use SchemaTrait;
+	use UUID;
 
 	const CONTEXT = 'https://schema.org/';
 
@@ -19,7 +21,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 	public function __construct(int $id = null)
 	{
 		if (isset($id)) {
-			if ($data = $this->_init($id)) {
+			if ($data = $this->_init($id) and isset($data->id)) {
 				$this->_setData($data);
 			}
 		}
@@ -71,8 +73,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		if (isset(static::$_pdo)) {
 			$sql     = sprintf('SELECT * FROM `%s` WHERE `id` = :id LIMIT 1;', $this::TYPE);
 			$stm     = static::$_pdo->prepare($sql);
-			$stm->id = $id;
-			$stm->execute();
+			$stm->execute([':id' => $id]);
 			return $stm->fetchObject();
 		} else {
 			return new \StdClass();

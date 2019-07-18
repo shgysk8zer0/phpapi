@@ -12,7 +12,7 @@ interface InputData
 
 	public function has(string ...$keys): bool;
 
-	public function __invoke(string $key, bool $escape = true);
+	public function __invoke(...$args);
 
 	public function __get(string $key);
 

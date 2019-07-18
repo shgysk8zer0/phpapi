@@ -1,6 +1,8 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
+
 class Thing extends Abstracts\Schema
 {
 	const TYPE = 'Thing';
@@ -10,14 +12,14 @@ class Thing extends Abstracts\Schema
 		return $this->_get('description');
 	}
 
-	final public function setDescription(string $description): string
+	final public function setDescription(string $description)
 	{
 		$this->_set('description', $description);
 	}
 
 	final public function getId(): int
 	{
-		return $this->_get('id');
+		return $this->_getId();
 	}
 
 	final public function getName(): string
@@ -30,19 +32,49 @@ class Thing extends Abstracts\Schema
 		$this->_set('name', $name);
 	}
 
-	public function create(): bool
+	public function setImage(ImageObject $img)
 	{
-		return true;
+		$this->_set('image', $img);
 	}
 
-	public function delete(): bool
+	public function getImage(): ImageObject
 	{
-		return true;
+		return $this->_get('image');
+	}
+
+	public static function create(InputData $input): self
+	{
+		$thing = new self();
+		$thing->_setUuid(static::generateUuid());
+
+		if ($input->has('name')) {
+			$thing->setName($input->get('name'));
+		}
+
+		if ($input->has('description')) {
+			$thing->setDescription($input->get('description'));
+		}
+
+		if ($input->has('image')) {
+			$thing->setImage(new ImageObject($input->get('image')));
+		}
+
+		return $thing;
 	}
 
 	protected function _setData(\StdClass $data)
 	{
-		$data->id = intval($data->id);
+		if (isset($data->name)) {
+			$this->setName($data->name);
+		}
+
+		if (isset($data->description)) {
+			$this->setDescrption($data->description);
+		}
+
+		if (isset($data->image)) {
+			$this->setImage(new ImageObject($data->image));
+		}
 		$this->_setDataObject($data);
 	}
 }
