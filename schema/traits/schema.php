@@ -12,8 +12,6 @@ trait Schema
 
 	protected $_id = 0;
 
-	protected $_uuid = '';
-
 	public function __debugInfo(): array
 	{
 		$this->_data;
@@ -25,16 +23,6 @@ trait Schema
 	final protected function _setId(int $id)
 	{
 		$this->_id = $id;
-	}
-
-	final protected function _setUuid(string $uuid)
-	{
-		$this->_uuid = $uuid;
-	}
-
-	final protected function getUuid(): string
-	{
-		return $this->_uuid;
 	}
 
 	final protected function _getId(): int

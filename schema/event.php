@@ -11,9 +11,9 @@ class Event extends Thing
 	protected function _setData(StdClass $data)
 	{
 		$this->_setId($data->id);
-		$this->_setUuid(static::generateUuid());
 		$this->setName($data->name);
 		$this->setStartDate(new DateTime($data->startDate));
+		$this->_set('identifier', $data->identifier);
 
 		if (isset($data->endDate)) {
 			$this->setEndDate(new DateTime($data->endDate));
