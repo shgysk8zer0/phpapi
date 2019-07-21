@@ -20,7 +20,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 	public function __construct(int $id = null)
 	{
 		if (isset($id)) {
-			if ($data = $this->_init($id) and isset($data->id)) {
+			if ($data = $this->_init('id', $id) and isset($data->id)) {
 				$this->_setData($data);
 			}
 		}
@@ -52,6 +52,16 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		return $this->getScript();
 	}
 
+	final public function getByUuid(string $uuid): bool
+	{
+		if ($data = $this->_init('identifier', $uuid) and isset($data->id)) {
+			$this->_setData($data);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	final public function getScript(): string
 	{
 		return sprintf(
@@ -71,12 +81,12 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		Headers::redirect(static::getSchemaURL());
 	}
 
-	final protected function _init(int $id): \StdClass
+	final protected function _init(string $key, $val): \StdClass
 	{
 		if (isset(static::$_pdo)) {
-			$sql     = sprintf('SELECT * FROM `%s` WHERE `id` = :id LIMIT 1;', $this::TYPE);
+			$sql     = sprintf('SELECT * FROM `%s` WHERE `%s` = :val LIMIT 1;', $this::TYPE, $key);
 			$stm     = static::$_pdo->prepare($sql);
-			$stm->execute([':id' => $id]);
+			$stm->execute([':val' => $val]);
 			return $stm->fetchObject();
 		} else {
 			return new \StdClass();
