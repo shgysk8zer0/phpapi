@@ -7,13 +7,7 @@ final class UUID implements \JSONSerializable
 
 	final public function __construct()
 	{
-		$this->_uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			mt_rand(0, 0xffff), mt_rand(0,0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0x0fff) | 0x4000,
-			mt_rand(0, 0x3fff) | 0x8000,
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-		);
+		$this->_uuid = static::generate();
 	}
 
 	final public function __toString()
@@ -24,5 +18,16 @@ final class UUID implements \JSONSerializable
 	final public function jsonSerialize(): string
 	{
 		return $this->_uuid;
+	}
+
+	final public static function generate(): string
+	{
+		return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff), mt_rand(0,0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+		);
 	}
 }

@@ -61,11 +61,6 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		);
 	}
 
-	final public static function generateUuid(): string
-	{
-		return new UUID();
-	}
-
 	final public static function getSchemaURL(): string
 	{
 		return new URL(static::TYPE, static::CONTEXT);

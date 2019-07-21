@@ -4,7 +4,7 @@ namespace shgysk8zer0\PHPAPI;
 
 use \DateTime;
 use \PDO;
-use \shgysk8zer0\PHPAPI\{Token, HTTPException, Headers, URL};
+use \shgysk8zer0\PHPAPI\{Token, HTTPException, Headers, URL, UUID};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 use \shgysk8zer0\PHPAPI\Schema\{Person};
@@ -259,11 +259,13 @@ final class User implements JsonSerializable
 			);');
 
 			$img = $this->_pdo->prepare('INSERT INTO `ImageObject` (
+				`identifier`,
 				`url`,
 				`width`,
 				`height`,
-				`encodingFormat`
+				`encodingFormat`,
 			) VALUES (
+				:uuid,
 				:url,
 				:width,
 				:height,
@@ -275,6 +277,7 @@ final class User implements JsonSerializable
 			$url->searchParams->set('d', 'mm');
 
 			$person = $this->_pdo->prepare('INSERT INTO `Person` (
+				`identifier`.
 				`givenName`,
 				`additionalName`,
 				`familyName`,
@@ -282,6 +285,7 @@ final class User implements JsonSerializable
 				`birthDate`,
 				`image`
 			) VALUES (
+				:uuid,
 				:givenName,
 				:additionalName,
 				:familyName,
@@ -291,6 +295,7 @@ final class User implements JsonSerializable
 			);');
 
 			if (! $img->execute([
+				':uuid'           => UUID::generate(),
 				':url'            => "{$url}",
 				':height'         => $url->searchParams->get('s'),
 				':width'          => $url->searchParams->get('s'),
@@ -298,6 +303,7 @@ final class User implements JsonSerializable
 			])) {
 				throw new HTTPException('Error creating user image', HTTP::INTERNAL_SERVER_ERROR);
 			} elseif (! $person->execute([
+				':uuid'           => UUID::generate(),
 				':givenName'      => $input->get('givenName'),
 				':additionalName' => $input->get('additionalName', true, null),
 				':familyName'     => $input->get('familyName'),

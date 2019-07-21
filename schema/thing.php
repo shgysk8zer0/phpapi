@@ -64,6 +64,7 @@ class Thing extends Abstracts\Schema
 
 	protected function _setData(\StdClass $data)
 	{
+		$this->_set('identifier', $data->identifier);
 		if (isset($data->name)) {
 			$this->setName($data->name);
 		}

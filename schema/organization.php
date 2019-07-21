@@ -50,6 +50,10 @@ class Organization extends Thing
 			$this->setDescription($data->description);
 		}
 
+		if (isset($data->url)) {
+			$this->setUrl($data->url);
+		}
+
 		if (isset($data->address)) {
 			$this->setAddress(new PostalAddress($data->address));
 		}

@@ -9,6 +9,7 @@ class GeoCoordinates extends \shgysk8zer0\PHPAPI\Schema\Abstracts\Intangible
 	protected function _setData(\StdClass $data)
 	{
 		$this->_setId($data->id);
+		$this->_set('identifier', $data->identifier);
 
 		$this->setLongitude($data->longitude);
 		$this->setLatitude($data->latitude);

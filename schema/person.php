@@ -19,7 +19,7 @@ class Person extends Thing
 	public static function create(InputData $input): Thing
 	{
 		$person = new self();
-		$person->_setUuid(static::generateUuid());
+		$this->_set('identifier', $data->identifier);
 		$this->_setId($data->id);
 		$person->setName($input->get('givenName'));
 

@@ -8,6 +8,7 @@ class Place extends Thing
 	protected function _setData(\StdClass $data)
 	{
 		$this->_setId($data->id);
+		$this->_set('identifier', $data->identifier);
 		if (isset($data->name)) {
 			$this->setName($data->name);
 		}
