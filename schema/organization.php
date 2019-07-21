@@ -42,7 +42,8 @@ class Organization extends Thing
 
 	protected function _setData(\StdClass $data)
 	{
-		$data->id = intval($data->id);
+		$this->_set('identifier', $data->identifier);
+		$this->_setId($data->id);
 
 		$this->setName($data->name);
 
