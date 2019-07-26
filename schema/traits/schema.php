@@ -12,11 +12,12 @@ trait Schema
 
 	protected $_id = 0;
 
+	protected static $_stms = [];
+
 	public function __debugInfo(): array
 	{
-		$this->_data;
+		$data = $this->_data;
 		$data['id'] = $this->_id;
-		$data['uuid'] = $this->_uuid;
 		return $data;
 	}
 
@@ -82,5 +83,19 @@ trait Schema
 		$data = $this->_data;
 		unset($data['created'], $data['updated'], $data['id']);
 		return array_merge(['@context' => $this::CONTEXT, '@type' => $this::TYPE], $data);
+	}
+
+	final protected function _getStm(string $key): \PDOStatement
+	{
+		if (! array_key_exists($this::TYPE, static::$_stms)) {
+			static::$_stms[$this::TYPE] = [];
+		}
+
+		if (! array_key_exists($key, static::$_stms[$this::TYPE])) {
+			$sql = sprintf($this::QUERY, $this::TYPE, $key);
+			static::$_stms[$this::TYPE][$key] = static::$_pdo->prepare($sql);
+		}
+
+		return static::$_stms[$this::TYPE][$key];
 	}
 }

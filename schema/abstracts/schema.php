@@ -17,6 +17,8 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 
 	const CONTENT_TYPE = 'application/ld+json';
 
+	const QUERY = 'SELECT * FROM `%s` WHERE `%s` = :val LIMIT 1;';
+
 	public function __construct(int $id = null)
 	{
 		if (isset($id)) {
@@ -33,7 +35,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 
 	final public function __get(string $prop)
 	{
-		if (function_exists([$this, 'get' . ucfirst($prop)])) {
+		if (function_exists('self::get' . ucfirst($prop))) {
 			call_user_func([$this, 'get' . ucfirst($prop)]);
 		} else {
 			return $this->_data[$prop] ?? null;
@@ -84,8 +86,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 	final protected function _init(string $key, $val): \StdClass
 	{
 		if (isset(static::$_pdo)) {
-			$sql     = sprintf('SELECT * FROM `%s` WHERE `%s` = :val LIMIT 1;', $this::TYPE, $key);
-			$stm     = static::$_pdo->prepare($sql);
+			$stm = $this->_getStm($key);
 			$stm->execute([':val' => $val]);
 			return $stm->fetchObject();
 		} else {
