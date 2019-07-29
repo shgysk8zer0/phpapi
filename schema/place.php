@@ -29,6 +29,12 @@ class Place extends Thing
 		}
 
 		$this->setPublicAccess($data->publicAccess === '1');
+
+		if (isset($data->openingHoursSpecification)) {
+			$days = OpeningHoursSpecification::getFromGroupById($data->openingHoursSpecification);
+			$this->setOpeningHoursSpecification(...$days);
+			unset($days);
+		}
 	}
 
 	public function setAddress(PostalAddress $address)
@@ -49,5 +55,10 @@ class Place extends Thing
 	public function setImage(ImageObject $img)
 	{
 		$this->_set('image', $img);
+	}
+
+	public function setOpeningHoursSpecification(OpeningHoursSpecification ...$specs)
+	{
+		$this->_set('openingHoursSpecification', $specs);
 	}
 }
