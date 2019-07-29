@@ -12,6 +12,11 @@ class Organization extends Thing
 		$this->_set('address', $addr);
 	}
 
+	public function setLocation(Place $place)
+	{
+		$this->_set('location', $place);
+	}
+
 	public function setEmail(string $email)
 	{
 		if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -33,6 +38,11 @@ class Organization extends Thing
 	public function setTelephone(string $phone)
 	{
 		$this->_set('telephone', $phone);
+	}
+
+	public function setFounder(Person $founder)
+	{
+		$this->_set('founder', $founder);
 	}
 
 	public function setLogo(ImageObject $logo)
@@ -59,6 +69,10 @@ class Organization extends Thing
 			$this->setAddress(new PostalAddress($data->address));
 		}
 
+		if (isset($data->location)) {
+			$this->setLocation(new Place($data->location));
+		}
+
 		if (isset($data->email)) {
 			$this->setEmail($data->email);
 		}
@@ -70,6 +84,10 @@ class Organization extends Thing
 		if (isset($data->faxNumber)) {
 			$this->setFaxNumber($data->faxNumber);
 		}
+
+		// if (isset($data->founder)) {
+		// 	$this->setFounder(new Person($data->founder));
+		// }
 
 		if (isset($data->image)) {
 			$this->setImage(new ImageObject($data->image));
