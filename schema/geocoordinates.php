@@ -23,6 +23,17 @@ class GeoCoordinates extends \shgysk8zer0\PHPAPI\Schema\Abstracts\Intangible
 		}
 	}
 
+	public function distanceTo(self $coords): float
+	{
+		$dLat = deg2rad($coords->latitude - $this->latitude);
+		$dLon = deg2rad($coords->longitude - $this->longitude);
+
+		$a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($this->latitude)) * cos(deg2rad($this->latitude)) * sin($dLon/2) * sin($dLon/2);
+		$c = 2 * asin(sqrt($a));
+		// Multiply by Equatorial radius of Earth (in meters)
+		return 6378137 * $c;
+	}
+
 	public function setLongitude(float $lng)
 	{
 		$this->_set('longitude', $lng);
