@@ -1,5 +1,6 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
+use \shgysk8zer0\PHPAPI\{File, UUID};
 use \DateTime;
 use \StdClass;
 
@@ -122,5 +123,23 @@ class ImageObject extends Thing
 	public function setContentLocation(Place $location)
 	{
 		$this->_set('contentLocation', $location);
+	}
+
+	final public static function createFromUploadFile(File $file): int
+	{
+		if ($file->saved) {
+			$img = new self();
+			[0 => $width, 1 => $height, 'mime' => $type] = getimagesize($file->location);
+			return $img->insert([
+				'identifier'     => new UUID(),
+				'url'            => $file->url,
+				'encodingFormat' => $type,
+				'contentSize'    => $file->size,
+				'width'          => $width,
+				'height'         => $height,
+			]);
+		} else {
+			return 0;
+		}
 	}
 }

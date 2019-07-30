@@ -45,6 +45,11 @@ final class Files implements JSONSerializable,  Iterator
 		return $this->_files;
 	}
 
+	final public function empty(): bool
+	{
+		return empty($this->_files);
+	}
+
 	/**
 	 * Gets the value @ $_iterator_position
 	 *
