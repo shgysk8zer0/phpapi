@@ -44,6 +44,62 @@ class Person extends Thing
 		return $person;
 	}
 
+	public function save(): int
+	{
+		$stm = static::$_pdo->prepare('INSERT INTO `Person` (
+			`identifier`,
+			`givenName`,
+			`additionalName`,
+			`familyName`,
+			`address`,
+			`email`,
+			`telephone`,
+			`birthDate`,
+			`gender`,
+			`jobTitle`,
+			`worksFor`,
+			`honorificPrefix`,
+			`honorificSuffix`,
+			`image`
+		) VALUES (
+			:identifier,
+			:givenName,
+			:additionalName,
+			:familyName,
+			:address,
+			:email,
+			:telephone,
+			:birthDate,
+			:gender,
+			:jobTitle,
+			:worksFor,
+			:honorificPrefix,
+			:honorificSuffix,
+			:image
+		);');
+
+		if ($stm->execute([
+			':identifier'      => new UUDI(),
+			':givenName'       => $this->givenName,
+			':additionalName'  => $this->additionalName ?? null,
+			':familyName'      => $this->familyName,
+			':address'         => isset($this->address) ? $this->address->getId() : null,
+			':email'           => $this->email ?? null,
+			':telephone'       => $this->telephone ?? null,
+			':birthDate'       => $this->birthDate ?? null,
+			':gender'          => $this->gender ?? null,
+			':jobTitle'        => $this->jobTitle ?? null,
+			':worksFor'        => isset($this->worksFor) ? $this->worksFor->getId() : null,
+			':honorificPrefix' => $this->honorificPrefix ?? null,
+			':honorificSuffix' => $this->honorificSuffix ?? null,
+			':image'           => isset($this->image) ? $this->image->getId() : null,
+		])) {
+			return static::$_pdo->lastInsertId();
+		} else {
+			return 0;
+		}
+	}
+
 	protected function _setData(\StdClass $data)
 	{
 		$data->id = intval($data->id);
