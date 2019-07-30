@@ -25,6 +25,8 @@ final class User implements JsonSerializable
 
 	private $_id       = null;
 
+	private $_uuid     = '';
+
 	private $_username = null;
 
 	private $_person   = null;
@@ -60,6 +62,7 @@ final class User implements JsonSerializable
 	{
 		switch($key) {
 			case 'id': return $this->_id;
+			case 'uuid': return $this->_uuid;
 			case 'username': return $this->_username;
 			case 'role': return $this->_role;
 			case 'permissions': return $this->_permissions;
@@ -86,6 +89,7 @@ final class User implements JsonSerializable
 	{
 		return [
 			'id'       => $this->id,
+			'uuid'     => $this->uuid,
 			'username' => $this->username,
 			'created'  => $this->created,
 			'updated'  => $this->updated,
@@ -105,6 +109,7 @@ final class User implements JsonSerializable
 		if ($this->loggedIn) {
 			return [
 				'id'       => $this->id,
+				'uuid'     => $this->uuid,
 				'username' => $this->username,
 				'role'     => $this->role,
 				'token'    => $this->token,
@@ -119,6 +124,7 @@ final class User implements JsonSerializable
 		} else {
 			return [
 				'id'       => null,
+				'uuid'     => null,
 				'username' => null,
 				'role'     => null,
 				'token'    => null,
@@ -137,6 +143,7 @@ final class User implements JsonSerializable
 		$stm = $this->_pdo->prepare(
 			'SELECT `Person`.`email` AS `username`,
 				`users`.`password` AS `hash`,
+				`users`.`uuid`,
 				`users`.`created`,
 				`users`.`updated`,
 				`users`.`person`,
@@ -158,6 +165,7 @@ final class User implements JsonSerializable
 			$perms = get_object_vars($perms);
 			unset($perms['id'], $perms['name']);
 			$this->_id = $id;
+			$this->_uuid = $data->uuid;
 			$this->_username = $data->username;
 			$this->_created = new DateTime($data->created);
 			$this->_updated = new DateTime($data->updated);
