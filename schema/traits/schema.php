@@ -42,7 +42,7 @@ trait Schema
 
 	public function delete(): bool
 	{
-		if ($this->_getId() !== 0) {
+		if ($this->isSaved()) {
 			$sql = sprintf('DELETE FROM `%s` WHERE `id` = :id LIMIT 1;', $this::TYPE);
 			$stm = $this->_pdo->prepare($sql);
 
@@ -75,6 +75,11 @@ trait Schema
 			}
 		}
 		$this->_data = $vars;
+	}
+
+	final public function isSaved(): bool
+	{
+		return $this->_id > 0;
 	}
 
 	public function jsonSerialize(): array

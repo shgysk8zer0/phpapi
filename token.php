@@ -12,7 +12,7 @@ final class Token implements \JSONSerializable
 
 	private $_date = null;
 
-	private $_expires = 12;
+	private $_expires = 15;
 
 	private $_key = '';
 
@@ -79,16 +79,23 @@ final class Token implements \JSONSerializable
 	{
 		$json = @base64_decode($token);
 		$data = @json_decode($json);
+
 		if (is_object($data) and isset($data->hmac, $data->expires, $data->date)) {
-			$now = new DateTime();
+			$now = time();
 			$hmac = $data->hmac;
-			$expires = new DateTime($data->expires);
-			$date = new DateTime($data->date);
+			$expires = strtotime($data->expires);
+			$date = strtotime($data->date);
 			$key = hash(self::HASH_ALGO, $key);
 			unset($data->hmac);
 			$gen_hmac = hash_hmac(self::HASH_ALGO, json_encode($data), $key, false);
 			$match = hash_equals($gen_hmac, $hmac);
-			$valid_dates = $now > $data->date and $now < $data->expires;
+			$valid_dates = ($now > $date and $now < $expires);
+			Headers::set('X-Date', $date);
+			Headers::set('X-NOW', $now);
+			Headers::set('X-EXPIRES', $expires);
+			Headers::set('X-EXPIRED', $expires < $now ? 'YES' : 'NO');
+			Headers::set('X-PRE', $now < $date ? 'YES' : 'NO');
+			Headers::set('X-VALID', $valid_dates ? 'VALID' : 'INVALID');
 
 			if ($valid_dates and $match) {
 				return $data->id;
