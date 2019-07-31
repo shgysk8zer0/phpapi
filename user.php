@@ -138,10 +138,11 @@ final class User implements JsonSerializable
 		}
 	}
 
-	final public function setUser(int $id): bool
+	final public function setUser(string $val, string $key = 'id'): bool
 	{
-		$stm = $this->_pdo->prepare(
+		$stm = $this->_pdo->prepare(sprintf(
 			'SELECT `Person`.`email` AS `username`,
+				`users`.`id`,
 				`users`.`password` AS `hash`,
 				`users`.`uuid`,
 				`users`.`created`,
@@ -150,13 +151,13 @@ final class User implements JsonSerializable
 				`users`.`role`
 			FROM `users`
 			JOIN `Person` ON `users`.`person` = `Person`.`id`
-			WHERE `users`.`id` = :id
+			WHERE `users`.`%s` = :val
 			LIMIT 1;'
-		);
+		, $key));
 
 		$perms_stm = $this->_pdo->prepare('SELECT * FROM `roles` WHERE `id` = :role LIMIT 1;');
 
-		$stm->bindValue(':id', $id);
+		$stm->bindValue(':val', $val);
 
 		if ($stm->execute() and $data = $stm->fetchObject()) {
 			$perms_stm->execute([':role' => $data->role]);
@@ -164,7 +165,7 @@ final class User implements JsonSerializable
 			$this->_role = $perms->name;
 			$perms = get_object_vars($perms);
 			unset($perms['id'], $perms['name']);
-			$this->_id = $id;
+			$this->_id = intval($data->id);
 			$this->_uuid = $data->uuid;
 			$this->_username = $data->username;
 			$this->_created = new DateTime($data->created);
@@ -303,7 +304,7 @@ final class User implements JsonSerializable
 			);');
 
 			if (! $img->execute([
-				':uuid'           => UUID::generate(),
+				':uuid'           => new UUID(),
 				':url'            => "{$url}",
 				':height'         => $url->searchParams->get('s'),
 				':width'          => $url->searchParams->get('s'),
