@@ -5,7 +5,7 @@ use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \DateTime;
 use \JSONSerializable;
 
-class AuthToken implements JSONSerialzable;
+class AuthToken implements JSONSerializable
 {
 	private $_pdo;
 
@@ -15,23 +15,44 @@ class AuthToken implements JSONSerialzable;
 
 	private $_key = null;
 
+	private $_generated = null;
+
 	private $_permissions = [
 		'name'          => true,
 		'email'         => true,
 		'image'         => true,
 		'telephone'     => false,
+		'address'       => false,
 		'readFiles'     => false,
 		'writeFiles'    => false,
 		'readPosts'     => false,
 		'writePosts'    => false,
 		'readComments'  => false,
 		'writeComments' => false,
+		'readEvents'    => false,
+		'writeEvents'   => false,
 	];
 
 	const ALGO = 'sha3-512';
 
+	const PERMISSIONS = [
+		'telephone',
+		'address',
+		'readFiles',
+		'writeFiles',
+		'readPosts',
+		'writePosts',
+		'readComments',
+		'writeComments',
+		'readEvents',
+		'writeEvents',
+	];
+
 	public function __construct(PDO $pdo = null, User $user = null)
 	{
+		$this->_generated = new DateTime();
+		$this->_uuid = new UUID();
+		$this->_key = hash(self::ALGO, new UUID());
 		if (isset($pdo)) {
 			$this->setPdo($pdo);
 		}
@@ -53,14 +74,13 @@ class AuthToken implements JSONSerialzable;
 	{
 		$data = [
 			'algo'        => self::ALGO,
-			'uuid'        => new UUID(),
+			'uuid'        => $this->_uuid,
 			'user'        => $this->getUserUuid(),
-			'generated'   => date(DateTime::W3C),
+			'generated'   => $this->_generated->format(DateTime::W3C),
 			'permissions' => $this->getPermissions(),
 		];
 
-		$key = hash(self::ALGO, new UUID());
-		$data['hmac'] = hash_hmac(self::ALGO, json_encode($data), $key, false);
+		$data['hmac'] = hash_hmac(self::ALGO, json_encode($data), $this->_key, false);
 		return $data;
 	}
 
@@ -143,23 +163,19 @@ class AuthToken implements JSONSerialzable;
 
 	final public function generate(string $algo = self::ALGO): string
 	{
+		return "{$this}";
+	}
+
+	final public function save(): bool
+	{
 		$stm =  $this->_prepare('INSERT INTO `token` (`uuid`, `pass`) VALUES (:uuid, :key);');
-		$data = [
-			'algo'        => $algo,
-			'uuid'        => new UUID(),
-			'user'        => $this->getUserUuid(),
-			'generated'   => date(DateTime::W3C),
-			'permissions' => $this->getPermissions(),
-		];
+		return $stm->execute([':uuid' => $this->_uuid, ':key' => $this->_key]);
+	}
 
-		$key = hash($algo, new UUID());
-		$data['hmac'] = hash_hmac($algo, json_encode($data), $key, false);
-
-		if ($stm->execute([':uuid' => $data['uuid'], ':key' => $key])) {
-			return base64_encode(json_encode($data));
-		} else {
-			throw new HTTPException('Error saving token', HTTP::INTERNAL_SERVER_ERROR);
-		}
+	final public function delete(): bool
+	{
+		$stm = $this->_pdo->prepare('DELETE FROM `token` WHERE `uuid` = :uuid LIMIT 1;');
+		return $stm->execute([':uuid' => $this->_uuid]);
 	}
 
 	final public function validate(string $req_token): bool
@@ -179,7 +195,10 @@ class AuthToken implements JSONSerialzable;
 				$user = new User($this->_pdo);
 				$user->setUser($user_stm->fetchObject()->id);
 				$this->setUser($user);
-				$this->_permissions = $token->permissions;
+				$this->_uuid = $token->uuid;
+				$this->_key = $match->key;
+				$this->_generated = new DateTime($token->generated);
+				$this->_permissions = get_object_vars($token->permissions);
 				return true;
 			} else {
 				return false;
