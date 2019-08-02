@@ -10,7 +10,7 @@ final class UUID implements \JSONSerializable
 		$this->_uuid = static::generate();
 	}
 
-	final public function __toString()
+	final public function __toString(): string
 	{
 		return $this->_uuid;
 	}

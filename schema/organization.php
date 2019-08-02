@@ -50,7 +50,7 @@ class Organization extends Thing
 		$this->_set('logo', $logo);
 	}
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_set('identifier', $data->identifier);
 		$this->_setId($data->id);

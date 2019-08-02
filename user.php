@@ -15,13 +15,13 @@ use \JsonSerializable;
 
 final class User implements JsonSerializable
 {
-	const PASSWORD_ALGO = PASSWORD_DEFAULT;
+	public const PASSWORD_ALGO = PASSWORD_DEFAULT;
 
-	const PASSWORD_OPTS = [
+	public const PASSWORD_OPTS = [
 		'cost' => 10,
 	];
 
-	const HASH_ALGO = 'sha3-256';
+	public const HASH_ALGO = 'sha3-256';
 
 	private $_id       = null;
 
@@ -391,7 +391,7 @@ final class User implements JsonSerializable
 		}
 	}
 
-	final static public function getUser(PDO $pdo = null, Int $id): self
+	final static public function getUser(PDO $pdo = null, int $id): self
 	{
 		if (is_null($pdo)) {
 			$pdo = PDO::load();
@@ -401,7 +401,7 @@ final class User implements JsonSerializable
 		return $user;
 	}
 
-	final public static function setKey(string $key)
+	final public static function setKey(string $key): void
 	{
 		static::$_key = $key;
 	}

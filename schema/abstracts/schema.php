@@ -40,7 +40,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		}
 	}
 
-	final public function __set(string $prop, $value)
+	final public function __set(string $prop, $value): void
 	{
 		if (function_exists([$this, 'set' . ucfirst($prop)])) {
 			call_user_func([$this, 'set' . ucfirst($prop)], $value);
@@ -81,7 +81,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 		Headers::redirect(static::getSchemaURL());
 	}
 
-	final protected function _init(string $key, $val): \StdClass
+	final protected function _init(string $key, $val): ?object
 	{
 		if (isset(static::$_pdo)) {
 			$sql     = sprintf('SELECT * FROM `%s` WHERE `%s` = :val LIMIT 1;', $this::TYPE, $key);
@@ -89,9 +89,9 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 			$stm->execute([':val' => $val]);
 			return $stm->fetchObject();
 		} else {
-			return new \StdClass();
+			return null;
 		}
 	}
 
-	abstract protected function _setData(\StdClass $data);
+	abstract protected function _setData(object $data);
 }

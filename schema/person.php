@@ -44,7 +44,7 @@ class Person extends Thing
 		return $person;
 	}
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$data->id = intval($data->id);
 

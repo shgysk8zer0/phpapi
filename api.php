@@ -77,7 +77,7 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __set(string $prop, $value)
+	final public function __set(string $prop, $value): void
 	{
 		switch(strtolower($prop)) {
 			case 'contenttype':
@@ -90,7 +90,7 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __call(string $method, array $args = [])
+	final public function __call(string $method, array $args = []): void
 	{
 		array_unshift($args, $this);
 		$method = strtoupper($method);
@@ -102,7 +102,7 @@ class API implements \JSONSerializable
 		}
 	}
 
-	final public function __invoke(...$args)
+	final public function __invoke(...$args): void
 	{
 		$method = $this->method;
 		static::allowMethods(...$this->options);
@@ -177,12 +177,12 @@ class API implements \JSONSerializable
 		];
 	}
 
-	final public function credentials(bool $allow_credentials = true)
+	final public function credentials(bool $allow_credentials = true): void
 	{
 		$this->_allow_credentials = $allow_credentials;
 	}
 
-	final public function on(string $method, callable $callback)
+	final public function on(string $method, callable $callback): void
 	{
 		$method = strtoupper($method);
 
@@ -209,7 +209,7 @@ class API implements \JSONSerializable
 		return array_key_exists($key, $this->files);
 	}
 
-	final public function redirect(URL $url, bool $permenant = false)
+	final public function redirect(URL $url, bool $permenant = false): void
 	{
 		Headers::redirect($url, $permenant);
 	}

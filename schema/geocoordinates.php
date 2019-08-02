@@ -6,7 +6,7 @@ class GeoCoordinates extends \shgysk8zer0\PHPAPI\Schema\Abstracts\Intangible
 	const TYPE = 'GeoCoordinates';
 	const DEFAULT_DIST_UNITS = 'ft';
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_setId($data->id);
 		$this->_set('identifier', $data->identifier);

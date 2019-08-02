@@ -31,7 +31,7 @@ final class URLSearchParams implements \JSONSerializable
 		return $this->_params;
 	}
 
-	final public function set(string $key, string $value)
+	final public function set(string $key, string $value): void
 	{
 		$this->_params[$key] = $value;
 	}

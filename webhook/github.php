@@ -103,6 +103,7 @@ final class GitHub implements \JSONSerializable
 	{
 		$type = strtolower($this->contentType);
 		$type = preg_replace('/;\s?boundary=[A-z\d]+$/', null, $type);
+
 		switch($type) {
 		case 'multipart/form-data':
 		case 'x-www-form-url-encoded':

@@ -62,7 +62,7 @@ class Thing extends Abstracts\Schema
 		return $thing;
 	}
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_set('identifier', $data->identifier);
 		if (isset($data->name)) {

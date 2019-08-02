@@ -48,6 +48,8 @@ class AuthToken implements JSONSerializable
 		'writeEvents',
 	];
 
+	private const _TABLE = 'token';
+
 	public function __construct(PDO $pdo = null, User $user = null)
 	{
 		$this->_generated = new DateTime();
@@ -168,20 +170,20 @@ class AuthToken implements JSONSerializable
 
 	final public function save(): bool
 	{
-		$stm =  $this->_prepare('INSERT INTO `token` (`uuid`, `pass`) VALUES (:uuid, :key);');
+		$stm =  $this->_prepare(sprintf('INSERT INTO `%s` (`uuid`, `pass`) VALUES (:uuid, :key);', self::_TABLE));
 		return $stm->execute([':uuid' => $this->_uuid, ':key' => $this->_key]);
 	}
 
 	final public function delete(): bool
 	{
-		$stm = $this->_pdo->prepare('DELETE FROM `token` WHERE `uuid` = :uuid LIMIT 1;');
+		$stm = $this->_pdo->prepare(sprintf('DELETE FROM `%s` WHERE `uuid` = :uuid LIMIT 1;', self::_TABLE));
 		return $stm->execute([':uuid' => $this->_uuid]);
 	}
 
 	final public function validate(string $req_token): bool
 	{
 		$token = json_decode(base64_decode($req_token));
-		$stm = $this->_prepare('SELECT `pass` AS `key` FROM `token` WHERE `uuid` = :uuid LIMIT 1;');
+		$stm = $this->_prepare(sprint('SELECT `pass` AS `key` FROM `%s` WHERE `uuid` = :uuid LIMIT 1;', self::_TABLE));
 
 		if ($stm->execute([':uuid' => $token->uuid])) {
 			$match = $stm->fetchObject();

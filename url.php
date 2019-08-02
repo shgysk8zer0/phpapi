@@ -126,7 +126,7 @@ class URL extends Ports implements \JSONSerializable
 		}
 	}
 
-	final public function __unset(string $key)
+	final public function __unset(string $key): void
 	{
 		switch($key) {
 			case 'search':
@@ -195,47 +195,47 @@ class URL extends Ports implements \JSONSerializable
 		];
 	}
 
-	final private function _setProtocol(string $protocol)
+	final private function _setProtocol(string $protocol): void
 	{
 		$this->_protocol = $protocol;
 	}
 
-	final private function _setUsername(string $username)
+	final private function _setUsername(string $username): void
 	{
 		$this->_username = urldecode($username);
 	}
 
-	final private function _setPassword(string $password)
+	final private function _setPassword(string $password): void
 	{
 		$this->_password = urldecode($password);
 	}
 
-	final private function _setHostname(string $hostname)
+	final private function _setHostname(string $hostname): void
 	{
 		$this->_hostname = $hostname;
 	}
 
-	final private function _setPort(int $port)
+	final private function _setPort(int $port): void
 	{
 		$this->_port = $port;
 	}
 
-	final private function _setPathname(string $pathname)
+	final private function _setPathname(string $pathname): void
 	{
 		$this->_pathname = '/' . ltrim($pathname, '/');
 	}
 
-	final private function _setSearch(string $query)
+	final private function _setSearch(string $query): void
 	{
 		$this->_setSearchParams(new URLSearchParams($query));
 	}
 
-	final private function _setSearchParams(URLSearchParams $params)
+	final private function _setSearchParams(URLSearchParams $params): void
 	{
 		$this->_searchParams = $params;
 	}
 
-	final private function _setHash(string $hash)
+	final private function _setHash(string $hash): void
 	{
 		$this->_hash = ltrim($hash, '#');
 	}

@@ -6,7 +6,7 @@ use \DateTime;
 
 final class Token implements \JSONSerializable
 {
-	const HASH_ALGO = 'sha3-512';
+	public const HASH_ALGO = 'sha3-512';
 
 	private $_id = 0;
 
@@ -25,7 +25,7 @@ final class Token implements \JSONSerializable
 		return base64_encode(json_encode($data));
 	}
 
-	final public function jsonSerialize(): Array
+	final public function jsonSerialize(): array
 	{
 		return [
 			'id' => $this->getId(),
