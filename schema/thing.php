@@ -5,7 +5,7 @@ use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 
 class Thing extends Abstracts\Schema
 {
-	const TYPE = 'Thing';
+	public const TYPE = 'Thing';
 
 	final public function getDescription(): string
 	{
@@ -62,7 +62,7 @@ class Thing extends Abstracts\Schema
 		return $thing;
 	}
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_set('identifier', $data->identifier);
 		if (isset($data->name)) {

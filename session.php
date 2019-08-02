@@ -86,7 +86,7 @@ final class Session implements \Iterator, \JSONSerializable
 	 * @return void
 	 * @example "$session->key = $value"
 	 */
-	public function __set(string $key, $value)
+	public function __set(string $key, $value): void
 	{
 		$_SESSION[$this->_getKey($key)] = $value;
 	}
@@ -108,7 +108,7 @@ final class Session implements \Iterator, \JSONSerializable
 	 * @return void
 	 * @example "unset($session->key)"
 	 */
-	public function __unset(string $key)
+	public function __unset(string $key): void
 	{
 		unset($_SESSION[$this->_getKey($key)]);
 	}

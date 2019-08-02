@@ -7,11 +7,12 @@ class PDO extends \PDO
 {
 	use PDOParamTypes;
 
-	const OPTIONS = [
+	private const OPTIONS = [
 		self::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
 		self::ATTR_ERRMODE            => self::ERRMODE_EXCEPTION,
 		self::ATTR_DEFAULT_FETCH_MODE => self::FETCH_OBJ,
 		self::ATTR_STATEMENT_CLASS    => [__NAMESPACE__ . '\\PDOStatement'],
+		self::ATTR_ORACLE_NULLS       => self::NULL_EMPTY_STRING,
 	];
 
 	private static $_instances = [];
@@ -54,7 +55,7 @@ class PDO extends \PDO
 		}
 	}
 
-	final public function insert(string $table, array $values): int
+	final public function insert(string $table, array $values): ?int
 	{
 		$keys = array_map(function(string $key): string
 		{
@@ -74,11 +75,15 @@ class PDO extends \PDO
 		);
 
 		$stm = $this->prepare($sql);
-		$stm->execute(array_combine($vals, array_values($values)));
-		return $this->lastInsertId();
+
+		if ($stm->execute(array_combine($vals, array_values($values)))) {
+			return $this->lastInsertId();
+		} else {
+			return null;
+		}
 	}
 
-	final public static function setCredsFile(string $creds_file)
+	final public static function setCredsFile(string $creds_file): void
 	{
 		static::$_creds_file = $creds_file;
 	}
@@ -100,6 +105,7 @@ class PDO extends \PDO
 				$data->port ?? 3306
 			);
 		}
+
 		return static::$_instances[$creds_file];
 	}
 }

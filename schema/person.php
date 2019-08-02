@@ -7,7 +7,7 @@ use \DateTime;
 
 class Person extends Thing
 {
-	const TYPE = 'Person';
+	public const TYPE = 'Person';
 
 	use Traits\Search;
 
@@ -44,7 +44,7 @@ class Person extends Thing
 		return $person;
 	}
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$data->id = intval($data->id);
 

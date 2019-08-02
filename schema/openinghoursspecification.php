@@ -6,7 +6,7 @@ use \DateTime;
 
 class OpeningHoursSpecification extends Thing
 {
-	const TYPE = 'OpeningHoursSpecification';
+	public const TYPE = 'OpeningHoursSpecification';
 
 	public function setDayOfWeek(string $day)
 	{
@@ -108,7 +108,7 @@ class OpeningHoursSpecification extends Thing
 		$stm = static::$_pdo->prepare($sql);
 		$stm->execute();
 
-		return array_map(function(StdClass $day): self
+		return array_map(function(object $day): self
 		{
 			$result = new self();
 			$result->_setData($day);
@@ -116,7 +116,7 @@ class OpeningHoursSpecification extends Thing
 		}, $stm->fetchAll());
 	}
 
-	protected function _setData(StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_set('identifier', $data->identifier);
 		$this->_setId($data->id);

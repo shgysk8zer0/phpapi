@@ -7,12 +7,12 @@ trait Headers
 {
 	static private $_headers = [];
 
-	final public static function set(string $key, string $value, bool $replace = true)
+	final public static function set(string $key, string $value, bool $replace = true): void
 	{
 		header("{$key}: {$value}", $replace);
 	}
 
-	final public static function append(string $key, string $value)
+	final public static function append(string $key, string $value): void
 	{
 		static::set($key, $value, false);
 	}
@@ -29,11 +29,11 @@ trait Headers
 		return array_key_exists(strtolower($key), static::$_headers);
 	}
 
-	final public static function delete(string $key)
+	final public static function delete(string $key): void
 	{
 		header_remove($key);
 	}
-	final public static function redirect(string $url, bool $permenant = false)
+	final public static function redirect(string $url, bool $permenant = false): void
 	{
 		if (! static::sent()) {
 			static::set('Location', $url);
@@ -44,7 +44,7 @@ trait Headers
 		}
 	}
 
-	final public static function authenticate(string $type = 'BASIC', string $realm = null, string $charset = 'UTF-8')
+	final public static function authenticate(string $type = 'BASIC', string $realm = null, string $charset = 'UTF-8'): void
 	{
 		if (! array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
 			static::status(HTTP::UNAUTHORIZED);
@@ -67,12 +67,12 @@ trait Headers
 		http_response_code($code);
 	}
 
-	final public static function contentType(string $content_type)
+	final public static function contentType(string $content_type): void
 	{
 		static::set('Content-Type', $content_type);
 	}
 
-	final protected static function _getHeaders()
+	final protected static function _getHeaders(): void
 	{
 		if (! empty(static::$_headers)) {
 			$headers = getallheaders();

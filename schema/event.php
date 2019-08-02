@@ -1,14 +1,13 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 
-use \StdClass;
 use \DateTime;
 
 class Event extends Thing
 {
-	const TYPE = 'Event';
+	public const TYPE = 'Event';
 
-	protected function _setData(StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_setId($data->id);
 		$this->setName($data->name);
@@ -76,7 +75,7 @@ class Event extends Thing
 			':end'   => $end,
 		]);
 
-		return array_map(function(\StdClass $result): self
+		return array_map(function(object $result): self
 		{
 			return new self($result->id);
 		}, $stm->fetchAll());

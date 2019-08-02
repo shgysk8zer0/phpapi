@@ -3,5 +3,5 @@ namespace shgysk8zer0\PHPAPI\Schema;
 
 class StructuredValue extends Abstracts\Intangible
 {
-	const TYPE = 'StructuredValue';
+	public const TYPE = 'StructuredValue';
 }

@@ -3,7 +3,7 @@ namespace shgysk8zer0\PHPAPI\Schema;
 
 final class MonetaryAmount
 {
-	const DEFAULT_CURRENCY = 'USD';
+	public const DEFAULT_CURRENCY = 'USD';
 
 	private $_value = 0;
 

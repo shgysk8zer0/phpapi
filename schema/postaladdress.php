@@ -3,9 +3,9 @@ namespace shgysk8zer0\PHPAPI\Schema;
 
 class PostalAddress extends Thing
 {
-	const TYPE = 'PostalAddress';
+	public const TYPE = 'PostalAddress';
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_setId($data->id);
 		$this->_set('identifier', $data->identifier);

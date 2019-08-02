@@ -3,9 +3,9 @@ namespace shgysk8zer0\PHPAPI\Schema;
 
 class Place extends Thing
 {
-	const TYPE = 'Place';
+	public const TYPE = 'Place';
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_setId($data->id);
 		$this->_set('identifier', $data->identifier);

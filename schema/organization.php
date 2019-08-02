@@ -3,7 +3,7 @@ namespace shgysk8zer0\PHPAPI\Schema;
 
 class Organization extends Thing
 {
-	const TYPE = 'Organization';
+	public const TYPE = 'Organization';
 
 	use Traits\Search;
 
@@ -50,7 +50,7 @@ class Organization extends Thing
 		$this->_set('logo', $logo);
 	}
 
-	protected function _setData(\StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_set('identifier', $data->identifier);
 		$this->_setId($data->id);

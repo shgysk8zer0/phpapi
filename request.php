@@ -29,7 +29,7 @@ class Request implements \JSONSerializable
 		];
 	}
 
-	final public function send(bool $assoc = false): \StdClass
+	final public function send(bool $assoc = false): object
 	{
 		return $this->_send($assoc);
 	}

@@ -4,10 +4,10 @@ namespace shgysk8zer0\PHPAPI;
 
 final class RandomString
 {
-	const LOWER    = 'abcdefghijklmnopqrstuvwxyz';
-	const UPPER    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	const NUMERALS = '0123456789';
-	const SPECIAL  = '~`!@#$%^&*()_-+=[{]}\\|;:\'",<.>/?';
+	private const _LOWER    = 'abcdefghijklmnopqrstuvwxyz';
+	private const _UPPER    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	private const _NUMERALS = '0123456789';
+	private const _SPECIAL  = '~`!@#$%^&*()_-+=[{]}\\|;:\'",<.>/?';
 
 	private $_length   = 0;
 	private $_lower    = false;
@@ -45,19 +45,19 @@ final class RandomString
 		$length = $this->getLength();
 
 		if ($this->getLower()) {
-			$chars .= self::LOWER;
+			$chars .= self::_LOWER;
 		}
 
 		if ($this->getUpper()) {
-			$chars .= self::UPPER;
+			$chars .= self::_UPPER;
 		}
 
 		if ($this->getNumerals()) {
-			$chars .= self::NUMERALS;
+			$chars .= self::_NUMERALS;
 		}
 
 		if ($this->getSpecial()) {
-			$chars .= self::SPECIAL;
+			$chars .= self::_SPECIAL;
 		}
 
 		$chars_len = strlen($chars) - 1;
@@ -79,7 +79,7 @@ final class RandomString
 		return file_put_contents($filename, $this, LOCK_EX);
 	}
 
-	public function setLength(int $length)
+	public function setLength(int $length): void
 	{
 		$this->_length = $length;
 	}
@@ -89,7 +89,7 @@ final class RandomString
 		return $this->_length;
 	}
 
-	public function setLower(bool $include)
+	public function setLower(bool $include): void
 	{
 		$this->_lower = $include;
 	}
@@ -99,7 +99,7 @@ final class RandomString
 		return $this->_lower;
 	}
 
-	public function setUpper(bool $include)
+	public function setUpper(bool $include): void
 	{
 		$this->_upper = $include;
 	}
@@ -109,7 +109,7 @@ final class RandomString
 		return $this->_upper;
 	}
 
-	public function setNumerals(bool $include)
+	public function setNumerals(bool $include): void
 	{
 		$this->_numerals = $include;
 	}
@@ -119,7 +119,7 @@ final class RandomString
 		return $this->_numerals;
 	}
 
-	public function setSpecial(bool $include)
+	public function setSpecial(bool $include): void
 	{
 		$this->_special = $include;
 	}

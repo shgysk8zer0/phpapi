@@ -66,7 +66,7 @@ trait Schema
 		$this->_data[$prop] = $value;
 	}
 
-	final protected function _setDataObject(\StdClass $data)
+	final protected function _setDataObject(object $data)
 	{
 		$vars = get_object_vars($data);
 		foreach ($vars as $key => $value) {

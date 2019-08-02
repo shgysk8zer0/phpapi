@@ -18,12 +18,12 @@ final class JSONFile implements \JSONSerializable
 		return array_key_exists($key, $this->_data);
 	}
 
-	final public function __unset(string $key)
+	final public function __unset(string $key): void
 	{
 		unset($this->_data[$key]);
 	}
 
-	final public function __set(string $key, $value)
+	final public function __set(string $key, $value): void
 	{
 		$this->_data[$key] = $value;
 	}

@@ -1,13 +1,12 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Schema;
 use \DateTime;
-use \StdClass;
 
 class ImageObject extends Thing
 {
-	const TYPE = 'ImageObject';
+	public const TYPE = 'ImageObject';
 
-	protected function _setData(StdClass $data)
+	protected function _setData(object $data)
 	{
 		$this->_setId($data->id);
 		$this->_set('identifier', $data->identifier);
@@ -96,17 +95,17 @@ class ImageObject extends Thing
 
 	public function setDateModified(DateTime $date)
 	{
-		$this->_set('dateModified', $date->format(\DateTime::W3C));
+		$this->_set('dateModified', $date->format(DateTime::W3C));
 	}
 
 	public function setUploadDate(DateTime $date)
 	{
-		$this->_set('uploadDate', $date->format(\DateTime::W3C));
+		$this->_set('uploadDate', $date->format(DateTime::W3C));
 	}
 
 	public function setDatePublished(DateTime $date)
 	{
-		$this->_set('datePublished', $date->format(\DateTime::W3C));
+		$this->_set('datePublished', $date->format(DateTime::W3C));
 	}
 
 	public function setCopyrightYear(int $year)

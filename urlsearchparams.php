@@ -3,9 +3,9 @@ namespace shgysk8zer0\PHPAPI;
 
 final class URLSearchParams implements \JSONSerializable
 {
-	const PREFIX     = '';
-	const SEPARATOR  = '&';
-	const ENCODING   =  PHP_QUERY_RFC1738;
+	public const PREFIX     = '';
+	public const SEPARATOR  = '&';
+	public const ENCODING   =  PHP_QUERY_RFC1738;
 	private $_params = [];
 
 	final public function __construct(string $query = '')
@@ -18,7 +18,8 @@ final class URLSearchParams implements \JSONSerializable
 
 	final public function __toString(): string
 	{
-		return count($this->_params) === 0 ? '' : '?' . http_build_query($this->_params, self::PREFIX, self::SEPARATOR, self::ENCODING);
+		return count($this->_params) === 0 ? ''
+			: '?' . http_build_query($this->_params, self::PREFIX, self::SEPARATOR, self::ENCODING);
 	}
 
 	final public function __debugInfo(): array
@@ -31,7 +32,7 @@ final class URLSearchParams implements \JSONSerializable
 		return $this->_params;
 	}
 
-	final public function set(string $key, string $value)
+	final public function set(string $key, string $value): void
 	{
 		$this->_params[$key] = $value;
 	}

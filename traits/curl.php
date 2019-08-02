@@ -14,7 +14,7 @@ trait cURL
 	private $_method  = 'GET';
 	private $_body    = [];
 
-	final public function setURL(string $url)
+	final public function setURL(string $url): void
 	{
 		if (filter_var($url, FILTER_VALIDATE_URL)) {
 			if (strpos($url, '?') !== false) {
@@ -28,32 +28,32 @@ trait cURL
 		}
 	}
 
-	final public function setHeader(string $key, string $value)
+	final public function setHeader(string $key, string $value): void
 	{
 		$this->_headers[$key] = $value;
 	}
 
-	final public function setHeaders(array $headers)
+	final public function setHeaders(array $headers): void
 	{
 		array_map([$this, 'setHeader'], array_keys($headers), array_values($headers));
 	}
 
-	final public function setMethod(string $method)
+	final public function setMethod(string $method): void
 	{
 		$this->_method = $method;
 	}
 
-	final public function setParam(string $key, $value)
+	final public function setParam(string $key, $value): void
 	{
 		$this->_body[$key] = $value;
 	}
 
-	final public function setParams(array $params)
+	final public function setParams(array $params): void
 	{
 		array_map([$this, 'setParam'], array_keys($params), array_values($params));
 	}
 
-	final public function addFile(string $name, string $filename)
+	final public function addFile(string $name, string $filename): void
 	{
 		if (file_exists($filename)) {
 			$this->setParam($name, new CURLFile($filename, mime_content_type($filename), $name));
@@ -62,7 +62,7 @@ trait cURL
 		}
 	}
 
-	final protected function _send(bool $assoc = false): StdClass
+	final protected function _send(bool $assoc = false): ?object
 	{
 		if (isset($this->_url)) {
 			$ch = curl_init();

@@ -7,7 +7,7 @@ trait InputData
 
 	protected $_data = [];
 
-	final protected function _setInputData(array $inputs = [])
+	final protected function _setInputData(array $inputs = []): void
 	{
 		$this->_data = array_map(function($val)
 		{

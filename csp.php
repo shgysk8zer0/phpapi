@@ -9,12 +9,12 @@ final class CSP
 
 	private $_report_to = null;
 
-	final public function __construct($default_src = 'none')
+	final public function __construct(string $default_src = 'none')
 	{
 		$this->_set('default-src', $default_src);
 	}
 
-	final public function send()
+	final public function send(): void
 	{
 		if (headers_sent()) {
 			trigger_error('Attempting to set CSP after headers sent');
@@ -161,13 +161,13 @@ final class CSP
 		return $this;
 	}
 
-	final public function reportTo(\StdClass $report_to): self
+	final public function reportTo(object $report_to): self
 	{
 		$this->_report_to = $report_to;
 		return $this;
 	}
 
-	final private function _set(string $key, string $value = null)
+	final private function _set(string $key, string $value = null): void
 	{
 		if (is_string($value)) {
 			$this->_policy[$key] = str_replace([

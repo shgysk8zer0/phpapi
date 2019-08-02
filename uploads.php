@@ -13,6 +13,7 @@ class Uploads extends \ArrayObject implements \JSONSerializable
 		{
 			return new UploadFile($key);
 		}, $keys);
+
 		parent::__construct(array_combine($keys, $values), self::ARRAY_AS_PROPS);
 	}
 
