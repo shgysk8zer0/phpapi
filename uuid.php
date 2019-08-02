@@ -5,6 +5,8 @@ final class UUID implements \JSONSerializable
 {
 	private $_uuid;
 
+	private const _FORMAT = '%04x%04x-%04x-%04x-%04x-%04x%04x%04x';
+
 	final public function __construct()
 	{
 		$this->_uuid = static::generate();
@@ -22,7 +24,7 @@ final class UUID implements \JSONSerializable
 
 	final public static function generate(): string
 	{
-		return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+		return sprintf(self::_FORMAT,
 			mt_rand(0, 0xffff), mt_rand(0,0xffff),
 			mt_rand(0, 0xffff),
 			mt_rand(0, 0x0fff) | 0x4000,

@@ -7,7 +7,7 @@ use \DateTime;
 
 class Person extends Thing
 {
-	const TYPE = 'Person';
+	public const TYPE = 'Person';
 
 	use Traits\Search;
 

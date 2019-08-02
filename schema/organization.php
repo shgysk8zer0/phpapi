@@ -3,7 +3,7 @@ namespace shgysk8zer0\PHPAPI\Schema;
 
 class Organization extends Thing
 {
-	const TYPE = 'Organization';
+	public const TYPE = 'Organization';
 
 	use Traits\Search;
 

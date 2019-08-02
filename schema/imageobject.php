@@ -4,7 +4,7 @@ use \DateTime;
 
 class ImageObject extends Thing
 {
-	const TYPE = 'ImageObject';
+	public const TYPE = 'ImageObject';
 
 	protected function _setData(object $data)
 	{

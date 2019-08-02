@@ -4,10 +4,10 @@ namespace shgysk8zer0\PHPAPI;
 
 final class RandomString
 {
-	const LOWER    = 'abcdefghijklmnopqrstuvwxyz';
-	const UPPER    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	const NUMERALS = '0123456789';
-	const SPECIAL  = '~`!@#$%^&*()_-+=[{]}\\|;:\'",<.>/?';
+	private const _LOWER    = 'abcdefghijklmnopqrstuvwxyz';
+	private const _UPPER    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	private const _NUMERALS = '0123456789';
+	private const _SPECIAL  = '~`!@#$%^&*()_-+=[{]}\\|;:\'",<.>/?';
 
 	private $_length   = 0;
 	private $_lower    = false;
@@ -45,19 +45,19 @@ final class RandomString
 		$length = $this->getLength();
 
 		if ($this->getLower()) {
-			$chars .= self::LOWER;
+			$chars .= self::_LOWER;
 		}
 
 		if ($this->getUpper()) {
-			$chars .= self::UPPER;
+			$chars .= self::_UPPER;
 		}
 
 		if ($this->getNumerals()) {
-			$chars .= self::NUMERALS;
+			$chars .= self::_NUMERALS;
 		}
 
 		if ($this->getSpecial()) {
-			$chars .= self::SPECIAL;
+			$chars .= self::_SPECIAL;
 		}
 
 		$chars_len = strlen($chars) - 1;

@@ -4,5 +4,5 @@ use \shgysk8zer0\PHPAPI\Schema\{Thing};
 
 abstract class Intangible extends Thing
 {
-	const TYPE = 'Intangible';
+	public const TYPE = 'Intangible';
 }

@@ -9,8 +9,9 @@ use \shgysk8zer0\PHPAPI\Traits\{Git};
 final class GitHub implements \JSONSerializable
 {
 	use Git;
-	const HOOKSHOT    = '/^GitHub-Hookshot/';
-	const MASTER      = 'refs/heads/master';
+	private const _HOOKSHOT    = '/^GitHub-Hookshot/';
+	private const _MASTER      = 'refs/heads/master';
+
 	private $_config  = null;
 	private $_data    = [];
 	private $_payload = null;
@@ -84,7 +85,7 @@ final class GitHub implements \JSONSerializable
 	}
 	public function isMaster(): bool
 	{
-		return isset($this->ref) && $this->ref === self::MASTER;
+		return isset($this->ref) && $this->ref === self::_MASTER;
 	}
 
 	private function  _getHeaders(): bool

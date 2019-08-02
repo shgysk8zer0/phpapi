@@ -5,7 +5,7 @@ use \DateTime;
 
 class Event extends Thing
 {
-	const TYPE = 'Event';
+	public const TYPE = 'Event';
 
 	protected function _setData(object $data)
 	{

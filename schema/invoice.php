@@ -7,7 +7,7 @@ namespace shgysk8zer0\PHPAPI\Schema;
  */
 class Invoice extends Thing
 {
-	const TYPE = 'Invoice';
+	public const TYPE = 'Invoice';
 
 	protected function _setData(object $data)
 	{

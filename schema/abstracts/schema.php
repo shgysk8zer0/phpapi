@@ -11,11 +11,11 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 {
 	use SchemaTrait;
 
-	const CONTEXT = 'https://schema.org/';
+	public const CONTEXT = 'https://schema.org/';
 
-	const TYPE    = 'Thing';
+	public const TYPE    = 'Thing';
 
-	const CONTENT_TYPE = 'application/ld+json';
+	public const CONTENT_TYPE = 'application/ld+json';
 
 	public function __construct(int $id = null)
 	{

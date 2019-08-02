@@ -3,7 +3,7 @@ namespace shgysk8zer0\PHPAPI\Abstracts;
 
 abstract class Ports
 {
-	const PORTS = [
+	public const PORTS = [
 		'http:'  => 80,
 		'https:' => 443,
 	];

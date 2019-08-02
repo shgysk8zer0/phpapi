@@ -6,7 +6,7 @@ use \DateTime;
 
 class OpeningHoursSpecification extends Thing
 {
-	const TYPE = 'OpeningHoursSpecification';
+	public const TYPE = 'OpeningHoursSpecification';
 
 	public function setDayOfWeek(string $day)
 	{

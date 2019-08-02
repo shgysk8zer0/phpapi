@@ -15,9 +15,9 @@ use \JsonSerializable;
 
 final class User implements JsonSerializable
 {
-	public const PASSWORD_ALGO = PASSWORD_DEFAULT;
+	private const _PASSWORD_ALGO = PASSWORD_DEFAULT;
 
-	public const PASSWORD_OPTS = [
+	private const _PASSWORD_OPTS = [
 		'cost' => 10,
 	];
 
@@ -322,7 +322,7 @@ final class User implements JsonSerializable
 			])) {
 				throw new HTTPException('Error creating `Person`');
 			}  elseif (! $user->execute([
-				':password' => password_hash($input->get('password', false), self::PASSWORD_ALGO, self::PASSWORD_OPTS),
+				':password' => password_hash($input->get('password', false), self::_PASSWORD_ALGO, self::_PASSWORD_OPTS),
 				':person'   => $this->_pdo->lastInsertId(),
 			])) {
 				throw new HTTPException('Error creating `user`');
@@ -346,13 +346,13 @@ final class User implements JsonSerializable
 	final public function passwordNeedsUpdate(): bool
 	{
 		return $this->_loggedIn
-			&& password_needs_rehash($this->_hash, self::PASSWORD_ALGO, self::PASSWORD_OPTS);
+			&& password_needs_rehash($this->_hash, self::_PASSWORD_ALGO, self::_PASSWORD_OPTS);
 	}
 
 	final public function changePassword(string $password): bool
 	{
 		if ($this->_loggedIn) {
-			$hash = password_hash($password, self::PASSWORD_ALGO, self::PASSWORD_OPTS);
+			$hash = password_hash($password, self::_PASSWORD_ALGO, self::_PASSWORD_OPTS);
 			$stm = $this->_pdo->prepare(
 				'UPDATE `users`
 				SET `password` = :hash

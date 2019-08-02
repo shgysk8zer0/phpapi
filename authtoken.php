@@ -33,9 +33,9 @@ class AuthToken implements JSONSerializable
 		'writeEvents'   => false,
 	];
 
-	const ALGO = 'sha3-512';
+	public const ALGO = 'sha3-512';
 
-	const PERMISSIONS = [
+	public const PERMISSIONS = [
 		'telephone',
 		'address',
 		'readFiles',

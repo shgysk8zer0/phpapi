@@ -5,7 +5,7 @@ use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
 
 class Thing extends Abstracts\Schema
 {
-	const TYPE = 'Thing';
+	public const TYPE = 'Thing';
 
 	final public function getDescription(): string
 	{
