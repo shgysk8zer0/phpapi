@@ -259,81 +259,49 @@ final class User implements JsonSerializable
 		$this->_pdo->beginTransaction();
 
 		try {
-			$user = $this->_pdo->prepare('INSERT INTO `users` (
-				`person`,
-				`password`
-			) VALUES (
-				:person,
-				:password
-			);');
-
-			$img = $this->_pdo->prepare('INSERT INTO `ImageObject` (
-				`identifier`,
-				`url`,
-				`width`,
-				`height`,
-				`encodingFormat`,
-			) VALUES (
-				:uuid,
-				:url,
-				:width,
-				:height,
-				:encodingFormat
-			);');
-
 			$url = new URL(sprintf('https://secure.gravatar.com/avatar/%s', md5($input->get('username'))));
 			$url->searchParams->set('s', 64);
 			$url->searchParams->set('d', 'mm');
 
-			$person = $this->_pdo->prepare('INSERT INTO `Person` (
-				`identifier`.
-				`givenName`,
-				`additionalName`,
-				`familyName`,
-				`email`,
-				`birthDate`,
-				`image`
-			) VALUES (
-				:uuid,
-				:givenName,
-				:additionalName,
-				:familyName,
-				:email,
-				:birthDate,
-				:image
-			);');
+			$img = $this->_pdo->insert('ImageObject', [
+				'identifier'     => new UUID(),
+				'url'            => "{$url}",
+				'height'         => $url->searchParams->get('s'),
+				'width'          => $url->searchParams->get('s'),
+				'encodingFormat' => 'image/jpeg',
+			]);
 
-			if (! $img->execute([
-				':uuid'           => new UUID(),
-				':url'            => "{$url}",
-				':height'         => $url->searchParams->get('s'),
-				':width'          => $url->searchParams->get('s'),
-				':encodingFormat' => 'image/jpeg',
-			])) {
-				throw new HTTPException('Error creating user image', HTTP::INTERNAL_SERVER_ERROR);
-			} elseif (! $person->execute([
-				':uuid'           => UUID::generate(),
-				':givenName'      => $input->get('givenName'),
-				':additionalName' => $input->get('additionalName', true, null),
-				':familyName'     => $input->get('familyName'),
-				':email'          => $input->get('username'),
-				':birthDate'      => $input->get('birthDate', true, null),
-				':image'          => $this->_pdo->lastInsertId(),
-			])) {
-				throw new HTTPException('Error creating `Person`');
-			}  elseif (! $user->execute([
-				':password' => password_hash($input->get('password', false), self::_PASSWORD_ALGO, self::_PASSWORD_OPTS),
-				':person'   => $this->_pdo->lastInsertId(),
-			])) {
-				throw new HTTPException('Error creating `user`');
-			} elseif ($id = intval($this->_pdo->lastInsertId()) and $id === 0) {
-				throw new HTTPException('Created `user` with `id` of 0 or null');
-			} elseif (! $this->_pdo->commit()) {
-				throw new HTTPException('Error commiting the `user` transaction');
-			} else {
-				$this->setUser($id);
-				return true;
+			if (! is_int($img)) {
+				throw new HTTPException('Error saving image', HTTP::INTERNAL_SERVER_ERROR);
 			}
+
+			$person =$this->_pdo->insert('Person', [
+				'identifier'     => new UUID(),
+				'givenName'      => $input->get('givenName'),
+				'additionalName' => $input->get('additionalName', true, null),
+				'familyName'     => $input->get('familyName'),
+				'email'          => $input->get('username'),
+				'birthDate'      => $input->get('birthDate', true, null),
+				'image'          => $img,
+			]);
+
+			if (! is_int($person)) {
+				throw new HTTPException('Error saving person', HTTP::INTERNAL_SERVER_ERROR);
+			}
+
+			$user = $this->_pdo->insert('users', [
+				'uuid'     => new UUID(),
+				'person'   => $person,
+				'password' => password_hash($input->get('password', false), self::_PASSWORD_ALGO, self::_PASSWORD_OPTS),
+			]);
+
+			if (! is_int($user)) {
+				throw new HTTPException('Error saving user', HTTP::INTERNAL_SERVER_ERROR);
+			}
+
+			$this->setUser($user);
+			$this->_pdo->commit();
+			return true;
 		} catch (Throwable $e) {
 			if ($this->_pdo->inTransaction()) {
 				$this->_pdo->rollback();
