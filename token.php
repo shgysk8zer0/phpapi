@@ -14,6 +14,8 @@ final class Token implements \JSONSerializable
 
 	private $_expires = 15;
 
+	private $_expires_units = 'min';
+
 	private $_key = '';
 
 	final public function __toString(): string
@@ -59,13 +61,14 @@ final class Token implements \JSONSerializable
 	final public function getExpires(): DateTime
 	{
 		$expires = clone($this->getDate());
-		$expires->modify("+ {$this->_expires} min");
+		$expires->modify("+ {$this->_expires} {$this->_expires_units}");
 		return $expires;
 	}
 
-	final public function setExpires(int $hours): self
+	final public function setExpires(int $value, string $units = 'min'): self
 	{
-		$this->_expires = $hours;
+		$this->_expires = $value;
+		$this->_expires_units = $units;
 		return $this;
 	}
 
@@ -90,12 +93,6 @@ final class Token implements \JSONSerializable
 			$gen_hmac = hash_hmac(self::HASH_ALGO, json_encode($data), $key, false);
 			$match = hash_equals($gen_hmac, $hmac);
 			$valid_dates = ($now > $date and $now < $expires);
-			Headers::set('X-Date', $date);
-			Headers::set('X-NOW', $now);
-			Headers::set('X-EXPIRES', $expires);
-			Headers::set('X-EXPIRED', $expires < $now ? 'YES' : 'NO');
-			Headers::set('X-PRE', $now < $date ? 'YES' : 'NO');
-			Headers::set('X-VALID', $valid_dates ? 'VALID' : 'INVALID');
 
 			if ($valid_dates and $match) {
 				return $data->id;

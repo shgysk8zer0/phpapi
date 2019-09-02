@@ -51,6 +51,11 @@ final class User implements JsonSerializable
 
 	private static $_key = null;
 
+	private static $_expires = [
+		'value' => 1,
+		'units' => 'year',
+	];
+
 	final public function __construct(PDO $pdo)
 	{
 		$this->_pdo = $pdo;
@@ -73,6 +78,7 @@ final class User implements JsonSerializable
 			case 'token':
 				if (is_null($this->_token) and isset(static::$_key) and $this->loggedIn) {
 					$token = new Token();
+					$token->setExpires(static::$_expires['value'], static::$_expires['units']);
 					$token->setId($this->_id);
 					$token->setDate(new DateTime());
 					$token->setKey(static::$_key);
@@ -372,6 +378,14 @@ final class User implements JsonSerializable
 	final public static function setKey(string $key): void
 	{
 		static::$_key = $key;
+	}
+
+	final public static function setExpires(int $value, string $units = 'min'): void
+	{
+		static::$_expires = [
+			'value' => $value,
+			'units' => $units,
+		];
 	}
 
 	final public static function haveIBeenPwned(string $pwd): bool
