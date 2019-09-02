@@ -20,5 +20,6 @@ jobs:
     - name: PHP Lint
       run: |
         pwd
+        ls -lah
         git submodule update --init --recursive
         php ./lint.php
