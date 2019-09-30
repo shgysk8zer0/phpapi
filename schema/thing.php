@@ -7,6 +7,8 @@ class Thing extends Abstracts\Schema
 {
 	public const TYPE = 'Thing';
 
+	public const CONTENT_TYPE = 'application/ld+json';
+
 	final public function getDescription(): string
 	{
 		return $this->_get('description');

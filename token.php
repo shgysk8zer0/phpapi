@@ -92,7 +92,7 @@ final class Token implements \JSONSerializable
 			unset($data->hmac);
 			$gen_hmac = hash_hmac(self::HASH_ALGO, json_encode($data), $key, false);
 			$match = hash_equals($gen_hmac, $hmac);
-			$valid_dates = ($now > $date and $now < $expires);
+			$valid_dates = ($now >= $date and $now < $expires);
 
 			if ($valid_dates and $match) {
 				return $data->id;
