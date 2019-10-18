@@ -79,7 +79,7 @@ trait FileUtils
 		}
 	}
 
-	final public function saveAs(string $path, $allow_override = false, $perms = 0666): bool
+	final public function saveAs(string $path, $allow_override = false, $perms = 0755): bool
 	{
 		if (! $this->exists()) {
 			return false;
