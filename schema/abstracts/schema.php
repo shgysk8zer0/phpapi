@@ -33,7 +33,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 
 	final public function __get(string $prop)
 	{
-		if (function_exists([$this, 'get' . ucfirst($prop)])) {
+		if (method_exists($this, 'get' . ucfirst($prop))) {
 			call_user_func([$this, 'get' . ucfirst($prop)]);
 		} else {
 			return $this->_data[$prop] ?? null;
@@ -42,7 +42,7 @@ abstract class Schema implements JSONSerializable, SchemaInterface
 
 	final public function __set(string $prop, $value): void
 	{
-		if (function_exists([$this, 'set' . ucfirst($prop)])) {
+		if (method($this, 'set' . ucfirst($prop))) {
 			call_user_func([$this, 'set' . ucfirst($prop)], $value);
 		}
 	}
