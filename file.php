@@ -82,12 +82,12 @@ class File implements \JSONSerializable
 
 	final public function hasError(): bool
 	{
-		return isset($this->error);
+		return isset($this->_error);
 	}
 
 	final public function valid(): bool
 	{
-		return ! $this->hasError();
+		return is_null($this->_error);
 	}
 
 	final private function _parse(array $file)

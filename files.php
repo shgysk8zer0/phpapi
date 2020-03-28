@@ -10,29 +10,30 @@ use \Iterator;
 final class Files implements JSONSerializable,  Iterator
 {
 	use Singleton;
+
 	private $_files = [];
+
 	private $_path = '';
+
 	private static $_allowed_types = [];
 
 	final private function __construct()
 	{
-		foreach($_FILES as $key => $file) {
+		foreach ($_FILES as $key => $file) {
 			if (is_array($file) and array_key_exists('error', $file) and $file['error'] !== UPLOAD_ERR_NO_FILE) {
 				$this->_files[$key] = new File($key, ...static::$_allowed_types);
 			}
 		}
 	}
 
-	final public function __get(string $key)
+	final public function __get(string $key):? File
 	{
-		if (isset($this->{$key})) {
-			return $this->_files[$key];
-		}
+		return $this->get($key);
 	}
 
 	final public function __isset(string $key): bool
 	{
-		return array_key_exists($key, $this->_files);
+		return $this->has($key);
 	}
 
 	final public function __debugInfo(): array
@@ -43,6 +44,25 @@ final class Files implements JSONSerializable,  Iterator
 	final public function jsonSerialize(): array
 	{
 		return $this->_files;
+	}
+
+	final public function get(string $key):? File
+	{
+		return $this->_files[$key] ?? null;
+	}
+
+	final public function has(string ...$keys): bool
+	{
+		$found = true;
+
+		foreach ($keys as $key) {
+			if (! array_key_exists($key, $_FILES)) {
+				$found = false;
+				break;
+			}
+		}
+
+		return $found;
 	}
 
 	/**
