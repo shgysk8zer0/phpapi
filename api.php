@@ -23,8 +23,13 @@ class API implements \JSONSerializable
 
 	private $_allow_credentials = false;
 
+	private $_request_id = null;
+
 	final public function __construct(string ...$allow_origins)
 	{
+		$this->_request_id = new UUID();
+		Headers::set('X-REQUEST-ID', $this->_request_id);
+
 		if (! empty($allow_origins)) {
 			$this->_allowed_origins = $allow_origins;
 		}
@@ -64,6 +69,7 @@ class API implements \JSONSerializable
 			case 'remotehost': return $_SERVER['REMOTE_HOST'] ?? null;
 			case 'referer':
 			case 'referrer': return array_key_exists('HTTP_REFERER', $_SERVER) ? new URL($_SERVER['HTTP_REFERER']) : null;
+			case 'requestid': return $this->_request_id;
 			case 'requesturi':
 			case 'requesturl': "{$this->_url}";
 			case 'serveraddress': return $_SERVER['SERVER_ADDR'];
@@ -153,6 +159,7 @@ class API implements \JSONSerializable
 			'DNT'                     => $this->dnt,
 			'upgradeInsecureRequests' => $this->upgradeInsecureRequests,
 			'remoteAddress'           => $this->remoteAddress,
+			'requestID'               => $this->requestid,
 		];
 	}
 
@@ -174,6 +181,7 @@ class API implements \JSONSerializable
 			'DNT'                     => $this->dnt,
 			'upgradeInsecureRequests' => $this->upgradeInsecureRequests,
 			'remoteAddress'           => $this->remoteAddress,
+			'requestID'               => $this->requestid,
 		];
 	}
 
