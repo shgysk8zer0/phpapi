@@ -1,7 +1,7 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-final class CSP
+final class CSP implements \JSONSerializable
 {
 	private $_policy = [];
 
@@ -9,9 +9,22 @@ final class CSP
 
 	private $_report_to = null;
 
+	private const _REPLACEMENTS = [
+		'self'           => "'self'",
+		'none'           => "'none'",
+		'unsafe-inline'  => "'unsafe-inline'",
+		'unsafe-eval'    => "'unsafe-eval'",
+		'strict-dynamic' => "'strict-dynamic'",
+	];
+
 	final public function __construct(string $default_src = 'none')
 	{
 		$this->_set('default-src', $default_src);
+	}
+
+	final public function jsonSerialize(): array
+	{
+		return $this->_policy;
 	}
 
 	final public function send(): void
@@ -167,25 +180,55 @@ final class CSP
 		return $this;
 	}
 
-	final private function _set(string $key, string $value = null): void
+	final public static function loadFromJson(object $json): self
 	{
-		if (is_string($value)) {
-			$this->_policy[$key] = str_replace([
-				'self',
-				'none',
-				'unsafe-inline',
-				'unsafe-eval',
-				'strict-dynamic',
-			], [
-				"'self'",
-				"'none'",
-				"'unsafe-inline'",
-				"'unsafe-eval'",
-				"'strict-dynamic'",
-			], $value);
-		} else {
-			$this->_policy[$key] = $value;
+		$csp = new self($json->{'default-src'} ?? 'none');
+		if (@is_array($json->{'img-src'})) {
+			$csp->imgSrc(...$json->{'img-src'});
 		}
+		if (@is_array($json->{'script-src'})) {
+			$csp->scriptSrc(...$json->{'script-src'});
+		}
+		if (@is_array($json->{'style-src'})) {
+			$csp->styleSrc(...$json->{'style-src'});
+		}
+		if (@is_array($json->{'font-src'})) {
+			$csp->fontSrc(...$json->{'font-src'});
+		}
+		if (@is_array($json->{'connect-src'})) {
+			$csp->connectSrc(...$json->{'connect-src'});
+		}
+		if (@is_array($json->{'media-src'})) {
+			$csp->mediaSrc(...$json->{'media-src'});
+		}
+		if (@is_array($json->{'object-src'})) {
+			$csp->objectSrc(...$json->{'object-src'});
+		}
+		if (@is_array($json->{'frame-src'})) {
+			$csp->frameSrc(...$json->{'frame-src'});
+		}
+		if (@is_array($json->{'report-uri'})) {
+			$csp->fontSrc(...$json->{'report-uri'});
+		}
+		if (@is_bool($json->{'block-all-mixed-content'})) {
+			$csp->blockAllMixedContent(...$json->{'block-all-mixed-content'});
+		}
+		return $csp;
+	}
+
+	final public static function loadFromJsonFile(string $filename): ?self
+	{
+		if (@file_exists($filename)) {
+			$json = json_decode(file_get_contents($filename));
+			return static::loadFromJson($json);
+		} else {
+			return null;
+		}
+	}
+
+	final private function _set(string $key, ?string $value = null): void
+	{
+		$this->_policy[$key] = $value;
 	}
 
 	final public function _rm(string $key)
