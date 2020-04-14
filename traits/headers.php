@@ -7,9 +7,11 @@ trait Headers
 {
 	static private $_headers = [];
 
-	final public static function set(string $key, string $value, bool $replace = true): void
+	final public static function set(string $key, ?string $value, bool $replace = true): void
 	{
-		header("{$key}: {$value}", $replace);
+		if (isset($value)) {
+			header("{$key}: {$value}", $replace);
+		}
 	}
 
 	final public static function append(string $key, string $value): void
@@ -17,7 +19,7 @@ trait Headers
 		static::set($key, $value, false);
 	}
 
-	final public static function get(string $key): string
+	final public static function get(string $key):? string
 	{
 		static::_getHeaders();
 		return static::$_headers[strtolower($key)];
@@ -44,7 +46,11 @@ trait Headers
 		}
 	}
 
-	final public static function authenticate(string $type = 'BASIC', string $realm = null, string $charset = 'UTF-8'): void
+	final public static function authenticate(
+		string  $type    = 'BASIC',
+		?string $realm   = null,
+		string  $charset = 'UTF-8'
+	): void
 	{
 		if (! array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
 			static::status(HTTP::UNAUTHORIZED);
@@ -70,6 +76,30 @@ trait Headers
 	final public static function contentType(string $content_type): void
 	{
 		static::set('Content-Type', $content_type);
+	}
+
+	final public static function acceptsAnything(): bool
+	{
+		return array_key_exists('HTTP_ACCEPT', $_SERVER)
+			&& is_int(strpos($_SERVER['HTTP_ACCEPT'], '*/*'));
+	}
+
+	final public static function canAccept(string ...$types): bool
+	{
+		$accept = false;
+
+		if (array_key_exists('HTTP_ACCEPT', $_SERVER)) {
+			$set = $_SERVER['HTTP_ACCEPT'];
+
+			foreach ($types as $type) {
+				if (is_int(strpos($set, $type))) {
+					$accept = true;
+					break;
+				}
+			}
+		}
+
+		return $accept;
 	}
 
 	final protected static function _getHeaders(): void
