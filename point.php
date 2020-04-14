@@ -8,7 +8,7 @@ use \shgysk8zer0\PHPAPI\Interfaces\{
 };
 use \InvalidArgumentException;
 
-class Point implements PointInterface
+class Point implements PointInterface, Interfaces\StringifyInterface
 {
 	private $_x = 0;
 
