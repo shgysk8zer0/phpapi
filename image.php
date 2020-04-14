@@ -2,6 +2,7 @@
 namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\{File, Color};
+
 use \shgysk8zer0\PHPAPI\Interfaces\{ImageEditInterface, ColorInterface, ImageInterface};
 use \shgysk8zer0\PHPGeo\{
 	Point,
@@ -10,6 +11,7 @@ use \shgysk8zer0\PHPGeo\{
 	Ellipse,
 	Circle
 };
+
 use \shgysk8zer0\PHPGeo\Interfaces\{
 	GeoPointInterface,
 	GeoLineInterface,
@@ -661,7 +663,7 @@ class Image implements ImageEditInterface
 
 	final public function crop(
 			GeoPointInterface $top_right,
-			 GeoPointInterface $bottom_left
+			GeoPointInterface $bottom_left
 	):? ImageInterface
 	{
 		if ($this->loaded() and $resource = imagecrop($this->_resource, [
