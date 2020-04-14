@@ -8,7 +8,9 @@ use \shgysk8zer0\PHPAPI\Interfaces\{
 	Ellipse as EllipseInterface,
 	Circle as CircleInterface,
 	Rectangle as RectangleInterface,
-	Color as ColorInterface
+	Color as ColorInterface,
+	Image as ImageInterface,
+	ImageEdit
 };
 use \StdClass;
 use \InvalidArgumentException;
@@ -16,7 +18,7 @@ use \InvalidArgumentException;
 /**
  * @SEE https://www.php.net/manual/en/book.image.php
  */
-class Image
+class Image implements ImageEdit
 {
 	private $_resource = null;
 
@@ -167,10 +169,10 @@ class Image
 	}
 
 	final public function copy(
-		self $img,
+		ImageInterface $img,
 		?PointInterface $at = null,
 		?PointInterface $from = null
-	):? self
+	):? ImageInterface
 	{
 		if ($this->loaded() and $img->loaded()) {
 			$dest = clone $this;
@@ -268,7 +270,7 @@ class Image
 		return is_resource($this->_resource);
 	}
 
-	final public function fill(ColorInterface $color, PointInterfae $from = null): bool
+	final public function fill(ColorInterface $color, PointInterface $from = null): bool
 	{
 		if ($this->loaded()) {
 			if (is_null($from)) {
@@ -282,7 +284,7 @@ class Image
 		float           $angle,
 		?ColorInterface $color              = null,
 		bool            $ignore_transparent = false
-	):? self
+	):? ImageInterface
 	{
 		if ($this->loaded()) {
 			if (is_null($color)) {
@@ -308,7 +310,7 @@ class Image
 		int $width,
 		int $height = -1,
 		int $mode   = IMG_BICUBIC
-	):? self
+	):? ImageInterface
 	{
 		if ($this->loaded()) {
 			$resource = imagescale($this->_resource, $width, $height, $mode);
@@ -326,7 +328,7 @@ class Image
 		int            $end,
 		ColorInterface $color,
 		int            $style  = IMG_ARC_PIE
-	):? bool
+	): bool
 	{
 		if ($this->loaded()) {
 			return imagearc($this->_resource, $center->getX(), $center->getY(),
@@ -344,7 +346,7 @@ class Image
 		int            $end,
 		ColorInterface $color,
 		int            $style  = IMG_ARC_PIE
-	):? bool
+	): bool
 	{
 		if ($this->loaded()) {
 			return imagefilledarc($this->_resource, $center->getX(), $center->getY(),
@@ -495,7 +497,7 @@ class Image
 		return $this->ellipseFilled($circle->asEllipse(), $color);
 	}
 
-	final public function line(Line $line, ColorInterface $color): bool
+	final public function line(LineInterface $line, ColorInterface $color): bool
 	{
 		if ($this->loaded()) {
 			return imageline($this->_resource, $line->getFrom()->getX(), $line->getFrom()->getY(),
@@ -651,7 +653,7 @@ class Image
 		}
 	}
 
-	final public function crop(PointInterface $top_right, PointInterface $bottom_left):? self
+	final public function crop(PointInterface $top_right, PointInterface $bottom_left):? ImageInterface
 	{
 		if ($this->loaded() and $resource = imagecrop($this->_resource, [
 			'x'      => $top_right->getX(),
@@ -669,7 +671,7 @@ class Image
 		int            $mode      = IMG_CROP_DEFAULT,
 		float          $threshold = 0.5,
 		ColorInterface $color     = null
-	):? self
+	):? ImageInterface
 	{
 		if (is_null($color)) {
 			$color = new Color();
@@ -682,7 +684,7 @@ class Image
 		}
 	}
 
-	final public static function loadFromFile(string $fname):? self
+	final public static function loadFromFile(string $fname):? ImageInterface
 	{
 		$resouce = null;
 
@@ -710,7 +712,7 @@ class Image
 		return static::createFromResource($resource);
 	}
 
-	final public static function create(int $width, int $height, bool $truecolor = true):? self
+	final public static function create(int $width, int $height, bool $truecolor = true):? ImageInterface
 	{
 		if ($truecolor) {
 			$resource = imagecreatetruecolor($width, $height);
@@ -721,7 +723,7 @@ class Image
 		return static::createFromResource($resource);
 	}
 
-	final public static function createFromResource($val = null):? self
+	final public static function createFromResource($val = null):? ImageInterface
 	{
 		if (is_resource($val)) {
 			$img = new self();
@@ -732,7 +734,7 @@ class Image
 		}
 	}
 
-	final public static function loadFromUpload(File $file):? self
+	final public static function loadFromUpload(File $file):? ImageInterface
 	{
 		if (! $file->hasError()) {
 			return static::loadFromFile($file->tmpName);
@@ -745,6 +747,7 @@ class Image
 	{
 		return getenv('GDFONTPATH') ?? null;
 	}
+
 	final public static function rgb(int $red, int $green, int $blue): ColorInterface
 	{
 		return new Color($red, $green, $blue);
