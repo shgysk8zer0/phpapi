@@ -1,16 +1,22 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\{File, Point, Line, Polygon, Ellipse, Color};
-use \shgysk8zer0\PHPAPI\Interfaces\{
-	Point as PointInterface,
-	Line as LineInterface,
-	Polygon as PolygonInterface,
-	Ellipse as EllipseInterface,
-	Circle as CircleInterface,
-	Rectangle as RectangleInterface,
-	Color as ColorInterface,
-	Image as ImageInterface,
-	ImageEdit
+
+use \shgysk8zer0\PHPAPI\{File, Color};
+use \shgysk8zer0\PHPAPI\Interfaces\{ImageEditInterface, ColorInterface, ImageInterface};
+use \shgysk8zer0\PHPGeo\{
+	Point,
+	Line,
+	Polygon,
+	Ellipse,
+	Circle
+};
+use \shgysk8zer0\PHPGeo\Interfaces\{
+	GeoPointInterface,
+	GeoLineInterface,
+	GeoPolygonInterface,
+	GeoEllipseInterface,
+	GeoCircleInterface,
+	GeoRectangleInterface,
 };
 use \StdClass;
 use \InvalidArgumentException;
@@ -18,7 +24,7 @@ use \InvalidArgumentException;
 /**
  * @SEE https://www.php.net/manual/en/book.image.php
  */
-class Image implements ImageEdit
+class Image implements ImageEditInterface
 {
 	private $_resource = null;
 
@@ -66,7 +72,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function getUpperLeft():? PointInterface
+	final public function getUpperLeft():? GeoPointInterface
 	{
 		if ($this->loaded()) {
 			return new Point(0, 0);
@@ -75,7 +81,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function getLowerLeft():? PointInterface
+	final public function getLowerLeft():? GeoPointInterface
 	{
 		if ($this->loaded()) {
 			return new Point(0, $this->getHeight());
@@ -84,7 +90,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function getUpperRight():? PointInterface
+	final public function getUpperRight():? GeoPointInterface
 	{
 		if ($this->loaded()) {
 			return new Point($this->getWidth(), 0);
@@ -93,7 +99,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function getLowerRight():? PointInterface
+	final public function getLowerRight():? GeoPointInterface
 	{
 		if ($this->loaded()) {
 		 	return new Point($this->getWidth(), $this->getHeight());
@@ -102,7 +108,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function getCenter():? PointInterface
+	final public function getCenter():? GeoPointInterface
 	{
 		if ($this->loaded()) {
 			return new Point($this->getHorizontalCenter(), $this->getVerticalCenter());
@@ -169,9 +175,9 @@ class Image implements ImageEdit
 	}
 
 	final public function copy(
-		ImageInterface $img,
-		?PointInterface $at = null,
-		?PointInterface $from = null
+		ImageInterface     $img,
+		?GeoPointInterface $at = null,
+		?GeoPointInterface $from = null
 	):? ImageInterface
 	{
 		if ($this->loaded() and $img->loaded()) {
@@ -270,7 +276,7 @@ class Image implements ImageEdit
 		return is_resource($this->_resource);
 	}
 
-	final public function fill(ColorInterface $color, PointInterface $from = null): bool
+	final public function fill(ColorInterface $color, GeoPointInterface $from = null): bool
 	{
 		if ($this->loaded()) {
 			if (is_null($from)) {
@@ -321,13 +327,13 @@ class Image implements ImageEdit
 	}
 
 	final public function arc(
-		PointInterface $center,
-		int            $width,
-		int            $height,
-		int            $start,
-		int            $end,
-		ColorInterface $color,
-		int            $style  = IMG_ARC_PIE
+		GeoPointInterface $center,
+		int               $width,
+		int               $height,
+		int               $start,
+		int               $end,
+		ColorInterface    $color,
+		int               $style  = IMG_ARC_PIE
 	): bool
 	{
 		if ($this->loaded()) {
@@ -339,13 +345,13 @@ class Image implements ImageEdit
 	}
 
 	final public function arcFilled(
-		PointInterface $center,
-		int            $width,
-		int            $height,
-		int            $start,
-		int            $end,
-		ColorInterface $color,
-		int            $style  = IMG_ARC_PIE
+		GeoPointInterface $center,
+		int               $width,
+		int               $height,
+		int               $start,
+		int               $end,
+		ColorInterface    $color,
+		int               $style  = IMG_ARC_PIE
 	): bool
 	{
 		if ($this->loaded()) {
@@ -356,7 +362,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function polygon(PolygonInterface $poly, ColorInterface $color = null): bool
+	final public function polygon(GeoPolygonInterface $poly, ColorInterface $color = null): bool
 	{
 		if ($this->loaded()) {
 			if (is_null($color)) {
@@ -373,7 +379,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function polygonFilled(PolygonInterface $poly, ColorInterface $color = null): bool
+	final public function polygonFilled(GeoPolygonInterface $poly, ColorInterface $color = null): bool
 	{
 		if ($this->loaded()) {
 			if (is_null($color)) {
@@ -390,7 +396,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function rectangle(RectangleInterface $rect, ColorInterface $color): bool
+	final public function rectangle(GeoRectangleInterface $rect, ColorInterface $color): bool
 	{
 		if ($this->loaded()) {
 			return imagerectangle($this->_resource, $rect->getFrom()->getX(), $rect->getFrom()->getY(),
@@ -400,7 +406,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function rectangleFilled(RectangleInterface $rect, ColorInterface $color): bool
+	final public function rectangleFilled(GeoRectangleInterface $rect, ColorInterface $color): bool
 	{
 		if ($this->loaded()) {
 			return imagefilledrectangle($this->_resource, $rect->getFrom()->getX(), $rect->getFrom()->getY(),
@@ -414,13 +420,13 @@ class Image implements ImageEdit
 	 * @SEE https://www.php.net/manual/en/function.imagefttext.php
 	 */
 	final public function text(
-		string          $text,
-		string          $font,
-		ColorInterface  $color,
-		float           $size        = 16,
-		PointInterface  $pt          = null,
-		float           $angle       = 0,
-		float           $linespacing = 1
+		string             $text,
+		string             $font,
+		ColorInterface     $color,
+		float              $size        = 16,
+		GeoPointInterface  $pt          = null,
+		float              $angle       = 0,
+		float              $linespacing = 1
 	):? array
 	{
 		if ($this->loaded()) {
@@ -465,7 +471,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function ellipse(EllipseInterface $ellipse, ColorInterface $color): bool
+	final public function ellipse(GeoEllipseInterface $ellipse, ColorInterface $color): bool
 	{
 		if ($this->loaded()) {
 			return imageellipse($this->_resource, $ellipse->getCenter()->getX(),
@@ -476,7 +482,7 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function ellipseFilled(EllipseInterface $ellipse, ColorInterface $color): bool
+	final public function ellipseFilled(GeoEllipseInterface $ellipse, ColorInterface $color): bool
 	{
 		if ($this->loaded()) {
 			return imagefilledellipse($this->_resource, $ellipse->getCenter()->getX(),
@@ -487,17 +493,17 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function circle(CircleInterface $circle, ColorInterface $color): bool
+	final public function circle(GeoCircleInterface $circle, ColorInterface $color): bool
 	{
 		return $this->ellipse($circle->asEllipse(), $color);
 	}
 
-	final public function circleFilled(CircleInterface $circle, ColorInterface $color): bool
+	final public function circleFilled(GeoCircleInterface $circle, ColorInterface $color): bool
 	{
 		return $this->ellipseFilled($circle->asEllipse(), $color);
 	}
 
-	final public function line(LineInterface $line, ColorInterface $color): bool
+	final public function line(GeoLineInterface $line, ColorInterface $color): bool
 	{
 		if ($this->loaded()) {
 			return imageline($this->_resource, $line->getFrom()->getX(), $line->getFrom()->getY(),
@@ -579,7 +585,7 @@ class Image implements ImageEdit
 	// @TODO implement scatter for PHP 7.4
 
 
-	final public function colorAt(PointInterface $pt):? ColorInterface
+	final public function colorAt(GeoPointInterface $pt):? ColorInterface
 	{
 		if ($this->loaded()) {
 			$rgb = imagecolorat($this->_resource, $pt->getX(), $pt->getY());
@@ -653,7 +659,10 @@ class Image implements ImageEdit
 		}
 	}
 
-	final public function crop(PointInterface $top_right, PointInterface $bottom_left):? ImageInterface
+	final public function crop(
+			GeoPointInterface $top_right,
+			 GeoPointInterface $bottom_left
+	):? ImageInterface
 	{
 		if ($this->loaded() and $resource = imagecrop($this->_resource, [
 			'x'      => $top_right->getX(),

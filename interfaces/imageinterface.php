@@ -1,20 +1,18 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Interfaces;
 
-use \shgysk8zer0\PHPAPI\Interfaces\{
-	Point as PointInterface,
-	Line as LineInterface,
-	Polygon as PolygonInterface,
-	Ellipse as EllipseInterface,
-	Circle as CircleInterface,
-	Rectangle as RectangleInterface,
-	Color as ColorInterface,
-	Image as ImageInterface
+use \shgysk8zer0\PHPGeo\Interfaces\{
+	GeoPointInterface,
+	GeoLineInterface,
+	GeoPolygonInterface,
+	GeoEllipseInterface,
+	GeoCircleInterface,
+	GeoRectangleInterface
 };
 
 use \StdClass;
 
-interface Image
+interface ImageInterface
 {
 	public function __destruct();
 
@@ -52,14 +50,12 @@ interface Image
 
 	public function saveAsWebP(?string $fname = null, int $quality = 80): bool;
 
-
-
-	public function fill(ColorInterface $color, PointInterface $from = null): bool;
+	public function fill(ColorInterface $color, GeoPointInterface $from = null): bool;
 
 	public function copy(
-		Image           $img,
-		?PointInterface $at = null,
-		?PointInterface $from = null
+		ImageInterface     $img,
+		?GeoPointInterface $at = null,
+		?GeoPointInterface $from = null
 	):? ImageInterface;
 
 	public function rotate(
@@ -76,7 +72,7 @@ interface Image
 		int $mode   = IMG_BICUBIC
 	):? ImageInterface;
 
-	public function crop(PointInterface $top_right, PointInterface $bottom_left):? ImageInterface;
+	public function crop(GeoPointInterface $top_right, GeoPointInterface $bottom_left):? ImageInterface;
 
 	public function autoCrop(
 		int            $mode      = IMG_CROP_DEFAULT,

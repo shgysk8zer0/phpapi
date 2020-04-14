@@ -3,7 +3,7 @@ namespace shgysk8zer0\PHPAPI\Interfaces;
 
 use \JSONSerializable;
 
-interface Color extends JSONSerializable
+interface ColorInterface extends JSONSerializable
 {
 	public function getRGB(): string;
 
@@ -29,11 +29,11 @@ interface Color extends JSONSerializable
 
 	public function hasAlpha(): bool;
 
-	public function rgb(int $r, int $g, int $b): Color;
+	public function rgb(int $r, int $g, int $b): ColorInterface;
 
-	public static function rgba(int $r, int $g, int $b, float $a): Color;
+	public static function rgba(int $r, int $g, int $b, float $a): ColorInterface;
 
-	public static function hex(string $hex):? Color;
+	public static function hex(string $hex):? ColorInterface;
 
-	public static function fromInt(int $color):? Color;
+	public static function fromInt(int $color):? ColorInterface;
 }
