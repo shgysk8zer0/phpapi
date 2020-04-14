@@ -1,7 +1,7 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Interfaces\{Color as ColorInterface};
+use \shgysk8zer0\PHPAPI\Interfaces\{ColorInterface};
 
 final class Color implements ColorInterface
 {
