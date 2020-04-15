@@ -11,7 +11,7 @@ trait LoggerInterpolatorTrait
 	 */
 	final public function interpolate(string $message, array $context = []): string
 	{
-		if (count($context) !== 0) {
+		if ($message !== '' and count($context) !== 0) {
 			$keys = array_map(function(string $key): string
 			{
 				return "{{$key}}";
