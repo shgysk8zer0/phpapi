@@ -1,7 +1,7 @@
 <?php
 namespace shgysk8zer0\PHPAPI\Traits;
 
-trait InputData
+trait InputDataTrait
 {
 	private static $_escape = true;
 

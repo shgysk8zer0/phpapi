@@ -57,7 +57,6 @@ abstract class HTTPStatusCodes {
 	public const REQUEST_HEADER_FILEDS_TOO_LARGE  = 431;
 	public const UNAVAILABLE_FOR_LEGAL_REASONS    = 451;
 
-
 	public const INTERNAL_SERVER_ERROR            = 500;
 	public const NOT_IMPLEMENTED                  = 501;
 	public const BAD_GATEWAY                      = 502;
@@ -70,4 +69,3 @@ abstract class HTTPStatusCodes {
 	public const NOT_EXTENDED                     = 510;
 	public const NETWORK_AUTHENTICATION_REQUIERED = 511;
 }
-

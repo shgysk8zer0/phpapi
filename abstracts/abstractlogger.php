@@ -15,8 +15,6 @@ abstract class AbstractLogger implements LoggerInterface
 	 * @param mixed[] $context
 	 *
 	 * @return void
-	 *
-	 * @throws \Psr\Log\InvalidArgumentException
 	 */
 	abstract public function log(string $level, string $message, array $context = []): void;
 }
