@@ -1,10 +1,13 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\Traits\{cURL};
+use \shgysk8zer0\PHPAPI\Traits\{cURL, LoggerAwareTrait};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \JsonSerializable;
 
-class Request implements \JSONSerializable
+class Request implements JSONSerializable, LoggerAwareInterface
 {
 	use cURL;
+	use LoggerAwareInterface;
 
 	public function __construct(
 		string $url,
@@ -13,6 +16,7 @@ class Request implements \JSONSerializable
 		array  $params  = []
 	)
 	{
+		$this->setLogger(new NullLogger());
 		$this->setURL($url);
 		$this->setMethod($method);
 		$this->setHeaders($headers);

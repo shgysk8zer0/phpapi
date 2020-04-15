@@ -1,9 +1,13 @@
 <?php
-
 namespace shgysk8zer0\PHPAPI;
 
-final class DSN implements \JSONSerializable
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait};
+use \JsonSerializable;
+
+final class DSN implements JSONSerializable, LoggerAwareInterface
 {
+	use LoggerAwareTrait;
 	private $_type     = 'mysql';
 	private $_database = null;
 	private $_host     = 'localhost';

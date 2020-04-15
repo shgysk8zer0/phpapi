@@ -1,8 +1,11 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\{Headers};
 
-class HTTPException extends \Exception implements \JSONSerializable
+use \shgysk8zer0\PHPAPI\{Headers};
+use \JsonSerializable;
+use \Exception;
+
+class HTTPException extends Exception implements JSONSerializable
 {
 	final public function __construct(string $message, int $code = Headers::INTERNAL_SERVER_ERROR, \Throwable $prev = null)
 	{
@@ -27,8 +30,9 @@ class HTTPException extends \Exception implements \JSONSerializable
 	final public function __invoke(bool $exit = true)
 	{
 		Headers::status($this->getCode());
-		Headers::set('Content-Type', 'application/json');
+		Headers::contentType('application/json');
 		echo json_encode($this);
+
 		if ($exit) {
 			exit();
 		}

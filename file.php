@@ -1,11 +1,16 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 use \shgysk8zer0\PHPAPI\{URL};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait, FileUtils};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
+use \JsonSerializable;
 
-class File implements \JSONSerializable
+class File implements JSONSerializable, LoggerAwareInterface
 {
-	use Traits\FileUtils;
+	use FileUtils;
+	use LoggerAwareTrait;
+
 	private $_name = '';
 	private $_tmp_name = '';
 	private $_size = 0;
@@ -17,6 +22,8 @@ class File implements \JSONSerializable
 
 	final public function __construct(string $key, string ...$allowed_types)
 	{
+		$this->setLogger(new NullLogger());
+
 		if (array_key_exists($key, $_FILES)) {
 			$this->_parse($_FILES[$key]);
 			if ($this->valid() and ! empty($allowed_types) and ! $this->_isAllowedType(...$allowed_types)) {

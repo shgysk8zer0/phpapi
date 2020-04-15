@@ -3,7 +3,15 @@ namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\{File, Color};
 
-use \shgysk8zer0\PHPAPI\Interfaces\{ImageEditInterface, ColorInterface, ImageInterface};
+use \shgysk8zer0\PHPAPI\Interfaces\{
+	ImageEditInterface,
+	ColorInterface,
+	ImageInterface,
+	LoggerAwareInterface,
+};
+
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait};
+
 use \shgysk8zer0\PHPGeo\{
 	Point,
 	Line,
@@ -28,7 +36,14 @@ use \InvalidArgumentException;
  */
 class Image implements ImageEditInterface
 {
+	use LoggerAwareTrait;
+
 	private $_resource = null;
+
+	protected function __construct()
+	{
+		$this->setLogger(new NullLogger());
+	}
 
 	final public function __destruct()
 	{

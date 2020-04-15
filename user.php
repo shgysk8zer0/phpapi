@@ -6,7 +6,8 @@ use \DateTime;
 use \PDO;
 use \shgysk8zer0\PHPAPI\{Token, HTTPException, Headers, URL, UUID};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
-use \shgysk8zer0\PHPAPI\Interfaces\{InputData};
+use \shgysk8zer0\PHPAPI\Interfaces\{InputData, LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait};
 use \shgysk8zer0\PHPAPI\Schema\{Person};
 use \Exception;
 use \InvalidArgumentException;
@@ -15,6 +16,8 @@ use \JsonSerializable;
 
 final class User implements JsonSerializable
 {
+	use LoggerAwareTrait;
+
 	private const _PASSWORD_ALGO = PASSWORD_DEFAULT;
 
 	private const _PASSWORD_OPTS = [
@@ -58,6 +61,7 @@ final class User implements JsonSerializable
 
 	final public function __construct(PDO $pdo)
 	{
+		$this->setLogger(new NullLogger());
 		$this->_pdo = $pdo;
 		Person::setPDO($pdo);
 		$this->_person = new Person();

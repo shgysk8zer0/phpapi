@@ -1,11 +1,14 @@
 <?php
 
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\Traits\{PDOParamTypes};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
 
-class PDO extends \PDO
+use \shgysk8zer0\PHPAPI\Traits\{PDOParamTypes, LoggerAwareTrait};
+
+class PDO extends \PDO implements LoggerAwareInterface
 {
 	use PDOParamTypes;
+	use LoggerAwareTrait;
 
 	private const OPTIONS = [
 		self::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
@@ -28,6 +31,8 @@ class PDO extends \PDO
 		int    $port     = 3306
 	)
 	{
+		$this->setLogger(new NullLogger());
+
 		if (is_null($database)) {
 			$database = $username;
 		}
@@ -39,12 +44,14 @@ class PDO extends \PDO
 		if (isset($database)) {
 			$dsn->setDatabase($database);
 		}
+
 		parent::__construct($dsn, $username, $password, self::OPTIONS);
 	}
 
 	public function __invoke(string ...$queries): \Generator
 	{
 		$this->beginTransaction();
+
 		try {
 			foreach ($queries as $query) {
 				yield $this->exec($query);
@@ -75,6 +82,7 @@ class PDO extends \PDO
 		);
 
 		$stm = $this->prepare($sql);
+		$stm->setLogger($this->logger);
 
 		if ($stm->execute(array_combine($vals, array_values($values)))) {
 			return $this->lastInsertId();
