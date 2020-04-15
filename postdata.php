@@ -4,13 +4,13 @@ use \JsonSerializable;
 use \Iterator;
 
 use \shgysk8zer0\PHPAPI\Interfaces\{
-	InputData as InputDataInterface,
+	InputDataInterface,
 	LoggerAwareInterface,
 };
 
 use \shgysk8zer0\PHPAPI\Traits\{
 	Singleton,
-	InputData as InputDataTrait,
+	InputDataTrait,
 	LoggerAwareTrait,
 };
 
