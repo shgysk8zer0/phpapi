@@ -2,12 +2,15 @@
 
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Traits\{CORS};
+use \shgysk8zer0\PHPAPI\Traits\{CORS, LoggerAwareTrait};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\{HTTPException};
 
-final class API
+final class API implements LoggerAwareInterface
 {
+	use LoggerAwareTrait;
+
 	final public function __construct(string $origin = '*', array $methods = ['POST', 'OPTIONS', 'HEAD'])
 	{
 		static::allowOrigin($origin);

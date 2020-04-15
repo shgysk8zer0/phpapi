@@ -1,13 +1,17 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait};
 use \RuntimeException;
 use \Exception;
 use \InvalidArgumentException;
 use \JSONSerializable;
 
-class UploadFile implements JSONSerializable
+class UploadFile implements JsonSerializable, LoggerAwareInterface
 {
+	use LoggerAwareTrait;
+
 	private static $_host = '';
 	private $_uploadPath  = null;
 	private $_path        = null;

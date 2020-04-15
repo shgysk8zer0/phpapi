@@ -1,11 +1,10 @@
 <?php
-
 namespace shgysk8zer0\PHPAPI;
 
+use \shgysk8zer0\PHPAPI\Traits\{Singleton};
 class Uploads extends \ArrayObject implements \JSONSerializable
 {
-	private static $_instance = null;
-
+	use Singleton;
 	protected function __construct()
 	{
 		$keys = array_keys($_FILES);
@@ -20,13 +19,5 @@ class Uploads extends \ArrayObject implements \JSONSerializable
 	public function jsonSerialize(): array
 	{
 		return $this->getArrayCopy();
-	}
-
-	public static function getInstance(): self
-	{
-		if (is_null(static::$_instance)) {
-			static::$_instance = new self();
-		}
-		return static::$_instance;
 	}
 }

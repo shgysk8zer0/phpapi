@@ -1,17 +1,19 @@
 <?php
-
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate, LoggerAwareTrait};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\{HTTPException, Headers, URL};
 use \Exception;
 use \StdClass;
+use \JsonSerializable;
 
-class API implements \JSONSerializable
+class API implements JSONSerializable, LoggerAwareInterface
 {
 	use CORS;
 	use Validate;
+	use LoggerAwareTrait;
 
 	private $_callbacks = [];
 

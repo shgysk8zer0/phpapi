@@ -1,11 +1,14 @@
 <?php
 
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\Traits\{PDOParamTypes};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
 
-class PDO extends \PDO
+use \shgysk8zer0\PHPAPI\Traits\{PDOParamTypes, LoggerAwareTrait};
+
+class PDO extends \PDO implements LoggerAwareInterface
 {
 	use PDOParamTypes;
+	use LoggerAwareTrait;
 
 	private const OPTIONS = [
 		self::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',

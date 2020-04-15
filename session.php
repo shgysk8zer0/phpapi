@@ -8,15 +8,20 @@
  */
 namespace shgysk8zer0\PHPAPI;
 
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait, Singleton};
+use \Iterator;
+use \JsonSerializable;
 /**
  * Since this class is using $_SESSION for all data, there are few variables
  * There are several methods to make better use of $_SESSION, and it adds the
  * ability to chain. As $_SESSION is used for all storage, there is no pro or
  * con to using __construct vs ::load()
 */
-final class Session implements \Iterator, \JSONSerializable
+final class Session implements Iterator, JSONSerializable, LoggerAwareTrait
 {
-	private static $_instance = null;
+	use LoggerAwareTrait;
+	use Singleton;
 
 	/**
 	 * Creates new instance of session. $name is optional, and sets session_name
@@ -252,15 +257,6 @@ final class Session implements \Iterator, \JSONSerializable
 	final public static function disabled(): bool
 	{
 		return static::status() === PHP_SESSION_DISABLED;
-	}
-
-
-	final public static function getInstance(): self
-	{
-		if (is_null(static::$_instance)) {
-			static::$_instance = new self();
-		}
-		return static::$_instance;
 	}
 
 	/**

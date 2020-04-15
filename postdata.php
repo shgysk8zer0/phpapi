@@ -1,10 +1,24 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
+use \JsonSerializable;
+use \Iterator;
 
-class PostData implements \JSONSerializable, \Iterator, Interfaces\InputData
+use \shgysk8zer0\PHPAPI\Interfaces\{
+	InputData as InputDataInterface,
+	LoggerAwareInterface,
+};
+
+use \shgysk8zer0\PHPAPI\Traits\{
+	Singleton,
+	InputData as InputDataTrait,
+	LoggerAwareTrait,
+};
+
+class PostData implements JSONSerializable, Iterator, InputDataInterface, LoggerAwareInterface
 {
-	use Traits\Singleton;
-	use Traits\InputData;
+	use Singleton;
+	use InputDataTrait;
+	use LoggerAwareTrait;
 
 	final public function __construct(array $data = null)
 	{
