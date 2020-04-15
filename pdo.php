@@ -82,6 +82,7 @@ class PDO extends \PDO implements LoggerAwareInterface
 		);
 
 		$stm = $this->prepare($sql);
+		$stm->setLogger($this->logger);
 
 		if ($stm->execute(array_combine($vals, array_values($values)))) {
 			return $this->lastInsertId();

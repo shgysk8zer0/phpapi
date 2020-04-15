@@ -10,11 +10,6 @@ final class PDOStatement extends \PDOStatement
 	use PDOParamTypes;
 	use LoggerAwareTrait;
 
-	final protected function __construct(...$args)
-	{
-		$this->setLogger(new NullLogger());
-	}
-
 	final public function __toString(): string
 	{
 		return $this->queryString;
