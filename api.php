@@ -1,19 +1,20 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
-use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate, LoggerAwareTrait};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface, LoggerAwareLoggerInterface};
+use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate, LoggerAwareTrait, LoggerAwareLoggerTrait};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
-use \shgysk8zer0\PHPAPI\{HTTPException, Headers, URL};
+use \shgysk8zer0\PHPAPI\{HTTPException, Headers, URL, NullLogger};
 use \Exception;
 use \StdClass;
 use \JsonSerializable;
 
-class API implements JSONSerializable, LoggerAwareInterface
+class API implements JSONSerializable, LoggerAwareLoggerInterface
 {
 	use CORS;
 	use Validate;
 	use LoggerAwareTrait;
+	use LoggerAwareLoggerTrait;
 
 	private $_callbacks = [];
 
@@ -29,6 +30,7 @@ class API implements JSONSerializable, LoggerAwareInterface
 
 	final public function __construct(string ...$allow_origins)
 	{
+		$this->setLogger(new NullLogger());
 		$this->_request_id = new UUID();
 		Headers::set('X-REQUEST-ID', $this->_request_id);
 
