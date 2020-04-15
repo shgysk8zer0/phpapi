@@ -1,7 +1,8 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Abstracts\AbstractLogger;
+use \shgysk8zer0\PHPAPI\Abstracts\{AbstractLogger, LogLevel};
+use \InvalidArgumentException;
 
 /**
  * This Logger can be used to avoid conditional log calls.
@@ -24,6 +25,8 @@ final class NullLogger extends AbstractLogger
      */
     final public function log(string $level, string $message, array $context = []): void
     {
-        // noop
+        if (! in_array($level, Abstracts\LogLevel::ALL_LEVELS)) {
+					throw new InvalidArgumentException(sprintf('Invalid log level: "%s"', $level));
+				}
     }
 }
