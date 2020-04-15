@@ -61,6 +61,7 @@ final class User implements JsonSerializable
 
 	final public function __construct(PDO $pdo)
 	{
+		$this->setLogger(new NullLogger());
 		$this->_pdo = $pdo;
 		Person::setPDO($pdo);
 		$this->_person = new Person();

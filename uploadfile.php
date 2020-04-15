@@ -21,6 +21,7 @@ class UploadFile implements JsonSerializable, LoggerAwareInterface
 
 	final public function __construct(string $key)
 	{
+		$this->setLogger(new NullLogger());
 		if (! array_key_exists($key, $_FILES)) {
 			throw new InvalidArgumentException("Undefined file: {$key}");
 		} elseif (! array_key_exists('tmp_name', $_FILES[$key]) || $_FILES[$key]['tmp_name'] === '') {

@@ -22,6 +22,8 @@ class File implements JSONSerializable, LoggerAwareInterface
 
 	final public function __construct(string $key, string ...$allowed_types)
 	{
+		$this->setLogger(new NullLogger());
+
 		if (array_key_exists($key, $_FILES)) {
 			$this->_parse($_FILES[$key]);
 			if ($this->valid() and ! empty($allowed_types) and ! $this->_isAllowedType(...$allowed_types)) {

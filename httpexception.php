@@ -2,15 +2,11 @@
 namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\{Headers};
-use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
-use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait};
 use \JsonSerializable;
 use \Exception;
 
-class HTTPException extends Exception implements JSONSerializable, LoggerAwareInterface
+class HTTPException extends Exception implements JSONSerializable
 {
-	use LoggerAwareTrait;
-
 	final public function __construct(string $message, int $code = Headers::INTERNAL_SERVER_ERROR, \Throwable $prev = null)
 	{
 		parent::__construct($message, $code, $prev);

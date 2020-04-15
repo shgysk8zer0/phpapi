@@ -40,6 +40,11 @@ class Image implements ImageEditInterface
 
 	private $_resource = null;
 
+	protected function __construct()
+	{
+		$this->setLogger(new NullLogger());
+	}
+
 	final public function __destruct()
 	{
 		if ($this->loaded()) {

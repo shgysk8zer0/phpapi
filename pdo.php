@@ -31,6 +31,8 @@ class PDO extends \PDO implements LoggerAwareInterface
 		int    $port     = 3306
 	)
 	{
+		$this->setLogger(new NullLogger());
+
 		if (is_null($database)) {
 			$database = $username;
 		}
@@ -42,12 +44,14 @@ class PDO extends \PDO implements LoggerAwareInterface
 		if (isset($database)) {
 			$dsn->setDatabase($database);
 		}
+
 		parent::__construct($dsn, $username, $password, self::OPTIONS);
 	}
 
 	public function __invoke(string ...$queries): \Generator
 	{
 		$this->beginTransaction();
+
 		try {
 			foreach ($queries as $query) {
 				yield $this->exec($query);

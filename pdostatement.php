@@ -2,11 +2,18 @@
 
 namespace shgysk8zer0\PHPAPI;
 use \PDO;
-use \shgysk8zer0\PHPAPI\Traits\{PDOParamTypes};
+use \shgysk8zer0\PHPAPI\Traits\{PDOParamTypes, LoggerAwareTrait};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
 
 final class PDOStatement extends \PDOStatement
 {
 	use PDOParamTypes;
+	use LoggerAwareTrait;
+
+	final protected function __construct(...$args)
+	{
+		$this->setLogger(new NullLogger());
+	}
 
 	final public function __toString(): string
 	{

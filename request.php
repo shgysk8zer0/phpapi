@@ -16,6 +16,7 @@ class Request implements JSONSerializable, LoggerAwareInterface
 		array  $params  = []
 	)
 	{
+		$this->setLogger(new NullLogger());
 		$this->setURL($url);
 		$this->setMethod($method);
 		$this->setHeaders($headers);

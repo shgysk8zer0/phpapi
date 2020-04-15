@@ -40,6 +40,7 @@ final class Session implements Iterator, JSONSerializable, LoggerAwareTrait
 		string $samesite = 'strict'
 	)
 	{
+		$this->setLogger(new NullLogger());
 		// Do not create new session of one has already been created
 		if (! static::active()) {
 			session_name($name);

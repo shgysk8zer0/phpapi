@@ -22,6 +22,7 @@ class PostData implements JSONSerializable, Iterator, InputDataInterface, Logger
 
 	final public function __construct(array $data = null)
 	{
+		$this->setLogger(new NullLogger());
 		if (isset($data)) {
 			$this->_setInputData($data);
 		} elseif (array_key_exists('CONTENT_TYPE', $_SERVER)) {
