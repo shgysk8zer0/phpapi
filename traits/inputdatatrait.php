@@ -15,6 +15,8 @@ trait InputDataTrait
 				return new self($val);
 			} elseif (is_object($val)) {
 				return new self(get_object_vars($val));
+			} elseif ($val === '') {
+				return null;
 			} else {
 				return $val;
 			}
@@ -79,7 +81,11 @@ trait InputDataTrait
 
 	final public function toObject():? object
 	{
-		return json_decode(json_encode($this));
+		if (count($this->_data) === 0) {
+			return null;
+		} else {
+			return json_decode(json_encode($this));
+		}
 	}
 
 	/**
