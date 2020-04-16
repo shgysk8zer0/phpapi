@@ -77,6 +77,11 @@ trait InputDataTrait
 		return $this->_data;
 	}
 
+	final public function toObject():? object
+	{
+		return json_decode(json_encode($this));
+	}
+
 	/**
 	 * Gets the value @ $_iterator_position
 	 *
