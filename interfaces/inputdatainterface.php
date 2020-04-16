@@ -22,6 +22,8 @@ interface InputDataInterface
 
 	public function jsonSerialize(): array;
 
+	public function toObject():? object;
+
 	/**
 	 * Gets the value @ $_iterator_position
 	 *
