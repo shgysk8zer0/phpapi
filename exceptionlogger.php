@@ -12,6 +12,7 @@ class ExceptionLogger implements LoggerAwareInterface
 
 	final protected function __construct()
 	{
+		$this->setLogger(new NullLogger());
 		// noop
 		// Prevent creating other instances by only allowing access via `::getInstace()`
 	}
