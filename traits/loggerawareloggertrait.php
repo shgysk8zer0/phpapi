@@ -137,7 +137,7 @@ trait LoggerAwareLoggerTrait
      * @return void
      */
     final public function log(string $level, string $message, array $context = []): void
-		{
-			$this->logger->log($level, $message, $context);
-		}
+	{
+		$this->logger->log($level, $message, $context);
+	}
 }

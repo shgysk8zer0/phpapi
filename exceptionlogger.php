@@ -1,20 +1,26 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface, LoggerInterface};
-use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait, Singleton};
+use \shgysk8zer0\PHPAPI\Interfaces\{
+	LoggerAwareInterface,
+	LoggerAwareLoggerInterface,
+};
+use \shgysk8zer0\PHPAPI\Traits\{
+	LoggerAwareTrait,
+	LoggerAwareLoggerTrait,
+	Singleton,
+};
 use \Throwable;
 
-class ExceptionLogger implements LoggerAwareInterface
+class ExceptionLogger implements LoggerAwareInterface, LoggerAwareLoggerInterface
 {
 	use Singleton;
 	use LoggerAwareTrait;
+	use LoggerAwareLoggerTrait;
 
 	final protected function __construct()
 	{
 		$this->setLogger(new NullLogger());
-		// noop
-		// Prevent creating other instances by only allowing access via `::getInstace()`
 	}
 
 	final public function logError(
