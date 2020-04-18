@@ -1,20 +1,20 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface, LoggerAwareLoggerInterface};
-use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate, LoggerAwareTrait, LoggerAwareLoggerTrait};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Traits\{CORS, Validate, LoggerAwareTrait};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
 use \shgysk8zer0\PHPAPI\{HTTPException, Headers, URL, NullLogger};
+use \Throwable;
 use \Exception;
 use \StdClass;
 use \JsonSerializable;
 
-class API implements JSONSerializable, LoggerAwareLoggerInterface
+class API implements JSONSerializable, LoggerAwareInterface
 {
 	use CORS;
 	use Validate;
 	use LoggerAwareTrait;
-	use LoggerAwareLoggerTrait;
 
 	private $_callbacks = [];
 
@@ -114,34 +114,55 @@ class API implements JSONSerializable, LoggerAwareLoggerInterface
 
 	final public function __invoke(...$args): void
 	{
+		$this->logger->debug('[{remoteaddress}] {method} {host}{pathname}', [
+			'method'        => $this->method,
+			'host'          => $this->url->host,
+			'pathname'      => $this->url->pathname,
+			'remoteaddress' => $this->remoteaddress
+		]);
+
 		$method = $this->method;
 		static::allowMethods(...$this->options);
 
-		if (in_array($this->origin, $this->_allowed_origins)) {
-			static::allowOrigin($this->origin);
-			if ($this->_allow_credentials) {
-				static::allowCredentials(true);
-			}
-		} elseif (in_array('*', $this->_allowed_origins)) {
-			if ($this->_allow_credentials === true and $this->origin !== null) {
-				static::allowCredentials(true);
+		try {
+			if (in_array('*', $this->_allowed_origins)) {
+				if ($this->_allow_credentials === true and $this->origin !== null) {
+					static::allowCredentials(true);
+					static::allowOrigin($this->origin);
+				} elseif ($this->origin !== null) {
+					static::allowOrigin('*');
+				}
+			} elseif (in_array($this->origin, $this->_allowed_origins)) {
 				static::allowOrigin($this->origin);
+
+				if ($this->_allow_credentials) {
+					static::allowCredentials(true);
+				}
+			}  else {
+				throw new HTTPException("{$this->origin} not allowed", HTTP::FORBIDDEN);
+			}
+
+			if (array_key_exists($method, $this->_callbacks)) {
+				foreach ($this->_callbacks[$method] as $callback) {
+					call_user_func($callback, $this, ...$args);
+				}
 			} else {
-				static::allowOrigin('*');
+				static::set('Allow', join(', ', $this->options));
+
+				throw new HTTPException("Unsupported Method: {$method}", HTTP::METHOD_NOT_ALLOWED);
 			}
-		} else {
-			throw new HTTPException("{$this->origin} not allowed", HTTP::FORBIDDEN);
+		} catch (Throwable $e) {
+			$this->logger->error('[{class} {code}] "{message} at {file}:{line}', [
+				'class'   => get_class($e),
+				'code'    => $e->getCode(),
+				'message' => $e->getMessage(),
+				'file'    => $_SERVER['DOCUMENT_ROOT'], null, $e->getFile(),
+				'line'    => $e->getLine(),
+			]);
+
+			throw $e;
 		}
 
-		if (array_key_exists($method, $this->_callbacks)) {
-			foreach ($this->_callbacks[$method] as $callback) {
-				call_user_func($callback, $this, ...$args);
-			}
-		} else {
-			static::set('Allow', join(', ', $this->options));
-
-			throw new HTTPException("Unsupported Method: {$method}", HTTP::METHOD_NOT_ALLOWED);
-		}
 	}
 
 	final public function __debugInfo(): array
