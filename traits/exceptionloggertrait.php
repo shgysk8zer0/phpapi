@@ -8,7 +8,7 @@ trait ExceptionLoggerTrait
 	final public function logException(Throwable $e, string $level = LogLevel::ERROR): void
 	{
 		$this->log($level, '[{class} {code}] "{message}" at {file}:{line}', [
-			'class'   => get_class($e);
+			'class'   => get_class($e),
 			'code'    => $e->getcode(),
 			'message' => $e->getMessage(),
 			'file'    => $e->getFile(),

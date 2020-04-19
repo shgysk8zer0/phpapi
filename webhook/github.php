@@ -2,13 +2,18 @@
 
 namespace shgysk8zer0\PHPAPI\WebHook;
 
-use \shgysk8zer0\PHPAPI\{HTTPException};
+use \shgysk8zer0\PHPAPI\{HTTPException, NullLogger};
+use \shgysk8zer0\PHPAPI\Traits\{Git, LoggerAwareTrait};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface, LoggerInterface};
 use \shgysk8zer0\PHPAPI\Abstracts\{HTTPStatusCodes as HTTP};
-use \shgysk8zer0\PHPAPI\Traits\{Git};
+use \JsonSerializable;
+use \Throwable;
 
-final class GitHub implements \JSONSerializable
+final class GitHub implements JsonSerializable, LoggerAwareInterface
 {
 	use Git;
+	use LoggerAwareTrait;
+
 	private const _HOOKSHOT    = '/^GitHub-Hookshot/';
 	private const _MASTER      = 'refs/heads/master';
 
@@ -19,18 +24,32 @@ final class GitHub implements \JSONSerializable
 	private $_headers = null;
 	private $_id      = null;
 
-	public function __construct(string $config)
+	public function __construct(string $config, LoggerInterface $logger = null)
 	{
-		$this->_getHeaders();
-		if (! array_key_exists('x-github-event', $this->_headers)) {
-			throw new HTTPException('Missing X-GitHub-Event header', HTTP::BAD_REQUEST);
-		} elseif (! array_key_exists('x-github-delivery', $this->_headers)) {
-			throw new HTTPException('Missing X-GitHub-Delivery header', HTTP::BAD_REQUEST);
+		if (isset($logger)) {
+			$this->setLogger($logger);
 		} else {
-			$this->_event  = $this->_headers['x-github-event'];
-			$this->_id     = $this->_headers['x-github-delivery'];
-			$this->_config = json_decode(file_get_contents($config));
-			$this->_parse();
+			$this->setLogger(new NullLogger());
+		}
+
+		$this->_getHeaders();
+
+		try {
+			if (! array_key_exists('x-github-event', $this->_headers)) {
+				throw new HTTPException('Missing X-GitHub-Event header', HTTP::BAD_REQUEST);
+			} elseif (! array_key_exists('x-github-delivery', $this->_headers)) {
+				throw new HTTPException('Missing X-GitHub-Delivery header', HTTP::BAD_REQUEST);
+			} elseif (! file_exists($config)) {
+				throw new HTTPException('Config file not found', HTTP::INTERNAL_SERVER_ERROR);
+			} else {
+				$this->_event  = $this->_headers['x-github-event'];
+				$this->_id     = $this->_headers['x-github-delivery'];
+				$this->_config = json_decode(file_get_contents($config));
+				$this->_parse();
+			}
+		} catch (Throwable $e) {
+			$this->_logException($e);
+			throw $e;
 		}
 	}
 
@@ -40,7 +59,6 @@ final class GitHub implements \JSONSerializable
 			'config'   => $this->_config,
 			'data'     => $this->_data,
 			'payload'  => $this->_payload,
-			'$_SERVER' => $_SERVER,
 			'headers'  => $this->_headers,
 			'event'    => $this->_event,
 			'branch'   => $this->getBranch(),
@@ -141,15 +159,30 @@ final class GitHub implements \JSONSerializable
 		}
 	}
 
+	private function _logException(Throwable $e): void
+	{
+		$this->logger->error('[{class} {code}] "{message}" at {file}:{line}', [
+			'class'   => get_class($e),
+			'code'    => $e->getcode(),
+			'message' => $e->getMessage(),
+			'file'    => $e->getFile(),
+			'line'    => $e->getLine(),
+		]);
+	}
+
 	private function _verifySecret(string $sig, string $payload, string $secret): bool
 	{
-		list($algo, $hmac) = explode('=', $sig, 2) + ['', ''];
+		list($algo, $hmac) = explode('=', $sig, 2) + [null, null];
 
-		if (in_array($algo, hash_algos(), true)) {
-			$hash_hmac = hash_hmac($algo, $payload, $secret);
-			return hash_equals($hash_hmac, $hmac);
+		if (is_null($algo) or is_null($hmac)) {
+				return false;
+		} elseif (! in_array($algo, hash_algos(), true)) {
+			return false;
+		} elseif (! hash_equals(hash_hmac($algo, $payload, $secret), $hmac)) {
+			$this->logger->warning('HMAC verification failed for GitHub Webhook');
+			return false;
 		} else {
-			throw new HTTPException(sprintf('Unsupported algo: %s', $algo), HTTP::INTERNAL_SERVER_ERROR);
+			return true;
 		}
 	}
 }
