@@ -5,7 +5,7 @@ use \shgysk8zer0\PHPAPI\Abstracts\{LogLevel};
 
 trait SplSubjectLoggerTrait
 {
-	private $_level = LogLevel::INFO;
+	private $_level = LogLevel::DEBUG;
 
 	private $_message = '';
 

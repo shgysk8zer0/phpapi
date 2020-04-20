@@ -6,12 +6,17 @@ use \shgysk8zer0\PHPAPI\Traits\{
 	ExceptionLoggerTrait,
 	SystemLoggerTrait,
 	Singleton,
+	SPLObserverLoggerTrait,
 };
 
-class SystemLogger extends Abstracts\AbstractLogger
+use \shgysk8zer0\PHPAPI\Abstracts\{AbstractLogger};
+use \SPLObserver;
+
+class SystemLogger extends AbstractLogger implements SPLObserver
 {
 	use LoggerInterpolatorTrait;
 	use SystemLoggerTrait;
 	use Singleton;
 	use ExceptionLoggerTrait;
+	use SPLObserverLoggerTrait;
 }

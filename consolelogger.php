@@ -5,15 +5,18 @@ use \shgysk8zer0\PHPAPI\Abstracts\{AbstractLogger, LogLevel};
 use \shgysk8zer0\PHPAPI\Traits\{
 	LoggerInterpolatorTrait,
 	ExceptionLoggerTrait,
+	SPLObserverLoggerTrait,
 	Singleton,
 };
 
+use \SPLObserver;
 use \InvalidArgumentException;
 
-class ConsoleLogger extends AbstractLogger
+class ConsoleLogger extends AbstractLogger implements SPLObserver
 {
 	use LoggerInterpolatorTrait;
 	use ExceptionLoggerTrait;
+	use SPLObserverLoggerTrait;
 	use Singleton;
 
 	public function log(string $level, string $message, array $context = []): void

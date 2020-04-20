@@ -135,7 +135,7 @@ final class Console implements ConsoleInterface
     private function __construct()
     {
         $this->_timestamp = $_SERVER['REQUEST_TIME'];
-        $this->_json['request_uri'] = $_SERVER['REQUEST_URI'];
+        $this->_json['request_uri'] = $_SERVER['REQUEST_URI'] ?? 'cli';
     }
 
     /**
