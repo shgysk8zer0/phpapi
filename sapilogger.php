@@ -2,16 +2,22 @@
 namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\Traits\{
-	LoggerInterpolatorTrait,
-	ExceptionLoggerTrait,
-	SAPILoggerTrait,
 	Singleton,
+	SAPILoggerTrait,
+	LoggerInterpolatorTrait,
+	SPLObserverLoggerTrait,
+	ExceptionLoggerTrait,
 };
 
-class SAPILogger extends Abstracts\AbstractLogger
+use \SPLObserver;
+
+use \shgysk8zer0\PHPAPI\Abstracts\{AbstractLogger};
+
+class SAPILogger extends AbstractLogger implements SPLObserver
 {
 	use LoggerInterpolatorTrait;
-	use SAPILogTrait;
+	use SAPILoggerTrait;
 	use Singleton;
 	use ExceptionLoggerTrait;
+	use SPLObserverLoggerTrait;
 }

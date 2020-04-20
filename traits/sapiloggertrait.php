@@ -4,7 +4,7 @@ namespace shgysk8zer0\PHPAPI\Traits;
 use \shgysk8zer0\PHPAPI\Abstracts\{LogLevel};
 use \InvalidArgumentException;
 
-trait SAPILogTrait
+trait SAPILoggerTrait
 {
 	final public function log(string $level, string $message, array $context = []): void
 	{

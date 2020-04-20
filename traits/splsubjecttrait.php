@@ -14,6 +14,13 @@ trait SPLSubjectTrait
 		}
 	}
 
+	final public function attachAll(SPLObserver... $observers): void
+	{
+		foreach ($observers as $observer) {
+			$this->attach($observer);
+		}
+	}
+
 	final public function detach(SplObserver $observer): void
 	{
 		if ($index = array_search($observer, $this->_observers, true)) {
