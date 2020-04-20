@@ -4,7 +4,7 @@ namespace shgysk8zer0\PHPAPI;
 use \shgysk8zer0\PHPAPI\Traits\{
 	LoggerInterpolatorTrait,
 	ExceptionLoggerTrait,
-	SAPILoggerTrait;
+	SAPILoggerTrait,
 	Singleton,
 };
 
