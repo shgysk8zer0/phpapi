@@ -2,12 +2,18 @@
 namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\Abstracts\{AbstractLogger, LogLevel};
-use \shgysk8zer0\PHPAPI\Traits\{LoggerInterpolatorTrait, Singleton};
+use \shgysk8zer0\PHPAPI\Traits\{
+	LoggerInterpolatorTrait,
+	ExceptionLoggerTrait,
+	Singleton,
+};
+
 use \InvalidArgumentException;
 
 class ConsoleLogger extends AbstractLogger
 {
 	use LoggerInterpolatorTrait;
+	use ExceptionLoggerTrait;
 	use Singleton;
 
 	public function log(string $level, string $message, array $context = []): void
