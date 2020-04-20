@@ -4,14 +4,14 @@ namespace shgysk8zer0\PHPAPI;
 use \shgysk8zer0\PHPAPI\Traits\{
 	LoggerInterpolatorTrait,
 	ExceptionLoggerTrait,
-	SAPILoggerTrait,
+	SystemLoggerTrait,
 	Singleton,
 };
 
-class SAPILogger extends Abstracts\AbstractLogger
+class SystemLogger extends Abstracts\AbstractLogger
 {
 	use LoggerInterpolatorTrait;
-	use SAPILogTrait;
+	use SystemLoggerTrait;
 	use Singleton;
 	use ExceptionLoggerTrait;
 }
