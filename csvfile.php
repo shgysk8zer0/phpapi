@@ -2,7 +2,7 @@
 namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
-use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait};
+use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait, FileUtilsTrait};
 use \shgysk8zer0\PHPAPI\Abstracts\{LogLevel};
 use \InvalidArgumentException;
 use \Throwable;
@@ -11,8 +11,7 @@ use \RuntimeException;
 class CSVFile implements LoggerAwareInterface
 {
 	use LoggerAwareTrait;
-
-	private $_handle = null;
+	use FileUtilsTrait;
 
 	public function __construct()
 	{
@@ -26,11 +25,11 @@ class CSVFile implements LoggerAwareInterface
 
 	public function __toString(): string
 	{
-		if (is_resource($this->_handle)) {
-			rewind($this->_handle);
+		if ($this->isOpen()) {
+			$this->rewind();
 			$text = '';
 
-			while ($line = fgets($this->_handle)) {
+			while ($line = $this->read()) {
 				$text .= $line;
 			}
 
@@ -40,40 +39,9 @@ class CSVFile implements LoggerAwareInterface
 		}
 	}
 
-	public function open(string $fname, string $mode = 'r'): bool
+	public function writeRow(array $row): bool
 	{
-		$this->close();
-
-		try {
-			if (! $this->_handle = fopen($fname, $mode)) {
-				throw new RuntimeException("Unable to open {$fname}");
-			} elseif (! flock($this->_handle, LOCK_SH)) {
-				throw new RuntimeException("Unable to acquire lock for {$fname}");
-			} else {
-				return true;
-			}
-		} catch (Throwable $e) {
-			$this->_logException($e);
-
-			return false;
-		}
-	}
-
-	public function close(): bool
-	{
-		if (is_resource($this->_handle)) {
-			flock($this->_handle, LOCK_UN);
-			fclose($this->_handle);
-			$this->_handle = null;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public function write(array $row): bool
-	{
-		if (is_resource($this->_handle)) {
+		if ($this->isOpen()) {
 			try {
 				return fputcsv($this->_handle, $row);
 			} catch (Throwable $e) {
@@ -87,7 +55,7 @@ class CSVFile implements LoggerAwareInterface
 
 	public function rows(bool $with_header = false): iterable
 	{
-		if (is_resource($this->_handle)) {
+		if ($this->isOpen()) {
 			rewind($this->_handle);
 
 			if ($with_header) {
