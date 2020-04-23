@@ -8,7 +8,7 @@ use \InvalidArgumentException;
 use \Throwable;
 use \RuntimeException;
 
-class CSVReader implements LoggerAwareInterface
+class CSVFile implements LoggerAwareInterface
 {
 	use LoggerAwareTrait;
 
@@ -45,11 +45,7 @@ class CSVReader implements LoggerAwareInterface
 		$this->close();
 
 		try {
-			if (! file_exists($fname)) {
-				throw new InvalidArgumentException("{$fname} not found");
-			} elseif (strtolower(pathinfo($fname, PATHINFO_EXTENSION)) !== 'csv') {
-				throw new InvalidArgumentException("{$fname} does not appear to be a CSV file");
-			} elseif (! $this->_handle = fopen($fname, $mode)) {
+			if (! $this->_handle = fopen($fname, $mode)) {
 				throw new RuntimeException("Unable to open {$fname}");
 			} elseif (! flock($this->_handle, LOCK_SH)) {
 				throw new RuntimeException("Unable to acquire lock for {$fname}");
@@ -75,49 +71,16 @@ class CSVReader implements LoggerAwareInterface
 		}
 	}
 
-	public function write(string $fname, iterable $rows): bool
+	public function write(array $row): bool
 	{
-		$handle  = null;
-		$tmp     = null;
-		$ret_val = true;
-
-		try {
-			if (! $handle = fopen($fname, 'w+')) {
-				throw new RuntimeException("Unable to open {$fname} for writing");
-			} elseif (! flock($handle, LOCK_EX)) {
-				throw new RuntimeException("Unable to acquire lock on {$fname}");
-			} else {
-				$tmp = tmpfile();
-				flock($tmp, LOCK_EX);
-
-				foreach ($rows as $row) {
-					if (fputcsv($tmp, $row) === false) {
-						throw new RuntimeException("Unable to write row to {$fname}");
-					}
-				}
-
-				rewind($tmp);
-				return stream_copy_to_stream($tmp, $handle) !== false;
-			}
-		} catch (Throwable $e) {
-			$this->_logException($e);
-			$ret_val = false;
-		} finally {
-			if (is_resource($handle)) {
-				flock($handle, LOCK_UN);
-				fclose($handle);
-			}
-
-			if (is_resource($tmp)) {
-				flock($tmp, LOCK_UN);
-				fclose($tmp);
-			}
-
-			return $ret_val;
+		if (is_resource($this->_handle)) {
+			return fputcsv($this->_handle, $row);
+		} else {
+			return false;
 		}
 	}
 
-	public function rows(bool $with_header = false):? iterable
+	public function rows(bool $with_header = false): iterable
 	{
 		if (is_resource($this->_handle)) {
 			rewind($this->_handle);
@@ -135,7 +98,7 @@ class CSVReader implements LoggerAwareInterface
 				}
 			}
 		} else {
-			return null;
+			return [];
 		}
 	}
 
