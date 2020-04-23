@@ -9,6 +9,18 @@ class TmpFile implements FileUtilsInterface
 {
 	use FileUtilsTrait;
 
+	public function __construct()
+	{
+		$this->open();
+		$this->lock(LOCK_EX);
+	}
+
+	public function __destruct()
+	{
+		$this->unlock();
+		$this->close();
+	}
+
 	public function open(): bool
 	{
 		if ($this->isOpen()) {
