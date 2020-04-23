@@ -74,7 +74,12 @@ class CSVFile implements LoggerAwareInterface
 	public function write(array $row): bool
 	{
 		if (is_resource($this->_handle)) {
-			return fputcsv($this->_handle, $row);
+			try {
+				return fputcsv($this->_handle, $row);
+			} catch (Throwable $e) {
+				$this->_logException($e);
+				return false;
+			}
 		} else {
 			return false;
 		}
