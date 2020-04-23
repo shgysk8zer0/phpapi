@@ -1,14 +1,14 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
 
-use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface};
+use \shgysk8zer0\PHPAPI\Interfaces\{LoggerAwareInterface, FileUtilsInterface};
 use \shgysk8zer0\PHPAPI\Traits\{LoggerAwareTrait, FileUtilsTrait};
 use \shgysk8zer0\PHPAPI\Abstracts\{LogLevel};
 use \InvalidArgumentException;
 use \Throwable;
 use \RuntimeException;
 
-class CSVFile implements LoggerAwareInterface
+class CSVFile implements LoggerAwareInterface, FileUtilsInterface
 {
 	use LoggerAwareTrait;
 	use FileUtilsTrait;
