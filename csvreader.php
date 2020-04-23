@@ -21,7 +21,7 @@ class CSVReader implements LoggerAwareInterface
 
 	public function __destruct()
 	{
-		$this->_close();
+		$this->close();
 	}
 
 	public function __toString(): string
