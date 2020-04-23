@@ -3,8 +3,6 @@ namespace shgysk8zer0\PHPAPI\Interfaces;
 use \InvalidArgumentException;
 interface FileUtilsInterface
 {
-	public function open(string $fname, string $mode = 'r'): bool;
-
 	public function close(): bool;
 
 	public function copyTo($resource, bool $rewind = true): bool;
