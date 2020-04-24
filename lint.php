@@ -1,39 +1,37 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\{Linter};
+
+use \shgysk8zer0\PHPAPI\{Linter, SAPILogger};
 use \LogicException;
-const BASE = __DIR__ . DIRECTORY_SEPARATOR;
+use \RuntimeException;
+
+const CONFIG = __DIR__ . DIRECTORY_SEPARATOR . 'config.ini';
 
 if (PHP_SAPI !== 'cli') {
 	http_response_code(403);
 	exit();
 } elseif (! isset($argv) or ! is_array($argv) or realpath($argv[0])!== __FILE__) {
 	throw new LogicException('Linter must be called directly');
+} elseif (! file_exists(CONFIG)) {
+	throw new RuntimeException('Config file not found');
+} elseif (! $config = parse_ini_file(CONFIG, true, INI_SCANNER_TYPED)) {
+	throw new RuntimeException('Error parsing config file');
 } else {
-	// Load required files
-	require_once BASE . 'abstracts/loglevel.php';
-	require_once BASE . 'traits/loggerawaretrait.php';
-	require_once BASE . 'interfaces/loggerawareinterface.php';
-	require_once BASE . 'interfaces/loggerinterface.php';
-	require_once BASE . 'traits/loggertrait.php';
-	require_once BASE . 'traits/splobserverloggertrait.php';
-	require_once BASE . 'traits/exceptionloggertrait.php';
-	require_once BASE . 'traits/singleton.php';
-	require_once BASE . 'traits/sapiloggertrait.php';
-	require_once BASE . 'abstracts/abstractlogger.php';
-	require_once BASE . 'nulllogger.php';
-	require_once BASE . 'traits/loggerinterpolatortrait.php';
-	require_once BASE . 'sapilogger.php';
-	require_once BASE . 'linter.php';
-	require_once BASE . 'shims.php';
+	date_default_timezone_set($config['init']['timezone']);
 
-	$logger = new SAPILogger();
-	$logger->registerExceptionHandler();
-	$logger->registerErrorHandler();
+	foreach ($config['init']['require'] as $path) {
+		require_once $path;
+	}
 
-	$linter = new Linter($logger);
-	$linter->ignoreDirs('./.git', './docs', './.github', './vendor');
-	$linter->scanExts('php');
+	set_include_path(join(PATH_SEPARATOR, $config['autoload']['path']));
+	spl_autoload_register($config['autoload']['function']);
+	spl_autoload_extensions(join(',', $config['autoload']['extensions']));
+
+	$linter = new Linter();
+	$linter->setLogger(new SAPILogger());
+	$linter->ignoreDirs(...$config['lint']['ignore']);
+	$linter->scanExts(...$config['lint']['extensions']);
+
 	$args = getopt('d:', ['dir:']);
 
 	if (array_key_exists('dir', $args)) {
