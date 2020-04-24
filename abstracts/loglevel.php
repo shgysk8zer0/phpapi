@@ -16,14 +16,14 @@ abstract class LogLevel
     public const INFO      = 'info';
     public const DEBUG     = 'debug';
 
-		public const ALL_LEVELS = [
-			self::EMERGENCY,
-			self::ALERT,
-			self::CRITICAL,
-			self::ERROR,
-			self::WARNING,
-			self::NOTICE,
-			self::INFO,
-			self::DEBUG,
-		];
+	public const ALL_LEVELS = [
+		self::EMERGENCY,
+		self::ALERT,
+		self::CRITICAL,
+		self::ERROR,
+		self::WARNING,
+		self::NOTICE,
+		self::INFO,
+		self::DEBUG,
+	];
 }
