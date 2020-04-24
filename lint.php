@@ -32,7 +32,7 @@ if (PHP_SAPI !== 'cli') {
 	$logger->registerErrorHandler();
 
 	$linter = new Linter($logger);
-	$linter->ignoreDirs('./.git', './docs', './.github');
+	$linter->ignoreDirs('./.git', './docs', './.github', './vendor');
 	$linter->scanExts('php');
 	$args = getopt('d:', ['dir:']);
 
