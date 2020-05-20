@@ -22,7 +22,7 @@ trait TemplateTrait
 		if ($this->has($key)) {
 			return $this->_data[$this->_convert($key)];
 		} else {
-			return $this->_data[$this->_convert($key)];
+			return null;
 		}
 	}
 
@@ -41,7 +41,11 @@ trait TemplateTrait
 		}
 	}
 
-	final public function stringify(bool $strip_comments = false, bool $trim = false, bool $nl_to_br): string
+	final public function stringify(
+		bool $strip_comments = false,
+		bool $trim           = false,
+		bool $nl_to_br
+	): string
 	{
 		$content = strtr($this->_content, $this->_data);
 

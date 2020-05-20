@@ -29,9 +29,9 @@ class Template
 
 	public function __construct(
 		string $filename,
+		bool   $use_include_path = self::USE_INCLUDE_PATH,
 		string $left_enclosure   = null,
 		string $right_enclsure   = null,
-		bool   $use_include_path = self::USE_INCLUDE_PATH,
 		string $charset          = null,
 		bool   $html_escape      = null,
 		bool   $trim             = null,
@@ -50,8 +50,9 @@ class Template
 		if (isset($right_enclosure)) $this->_right_enclosure = $right_enclosure;
 
 		if (! $this->_openFile($filename, $use_include_path)) {
-			$this->_filename = $filename;
 			throw new InvalidArgumentException(sprintf('Could not locate template file: "%s"', $filename));
+		} else {
+			$this->_filename = $filename;
 		}
 	}
 
@@ -118,9 +119,9 @@ class Template
 		$this->_trim = $val;
 	}
 
-	final public function saveAs(string $filename): bool
+	final public function saveAs(string $filename, int $flags = LOCK_EX): bool
 	{
-		return file_put_contents($filename, $this, LOCK_EX) !== false;
+		return file_put_contents($filename, $this, $flags) !== false;
 	}
 
 	final protected function _convert(string $key): string
