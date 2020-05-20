@@ -49,7 +49,7 @@ class Template
 		if (isset($left_enclosure))  $this->_left_enclosure = $left_enclosure;
 		if (isset($right_enclosure)) $this->_right_enclosure = $right_enclosure;
 
-		if ($this->_openFile($filename, $use_include_path)) {
+		if ($this->openFile($filename, $use_include_path)) {
 			$this->_filename = $filename;
 		} else {
 			throw new InvalidArgumentException(sprintf('Could not locate template file: "%s"', $filename));
