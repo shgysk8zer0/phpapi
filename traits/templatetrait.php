@@ -41,9 +41,23 @@ trait TemplateTrait
 		}
 	}
 
-	final public function stringify(): string
+	final public function stringify(bool $strip_comments = false, bool $trim = false, bool $nl_to_br): string
 	{
-		return strtr($this->_content, $this->_data);
+		$content = strtr($this->_content, $this->_data);
+
+		if ($strip_comments) {
+			$content = $this->_stripComments($content);
+		}
+
+		if ($trim) {
+			$content = str_replace(["\n", "\r", "\t"], [null, null, null], $content);
+		}
+
+		if ($nl_to_br) {
+			$content = nl2br($content);
+		}
+
+		return trim($content);
 	}
 
 	final protected function _setContent(string $content): void
