@@ -32,8 +32,8 @@ class Template
 		bool   $use_include_path = self::USE_INCLUDE_PATH,
 		string $left_enclosure   = null,
 		string $right_enclsure   = null,
-		string $charset          = null,
 		bool   $html_escape      = null,
+		string $charset          = null,
 		bool   $trim             = null,
 		bool   $nl_to_br         = null,
 		bool   $strip_comments   = null
@@ -49,10 +49,10 @@ class Template
 		if (isset($left_enclosure))  $this->_left_enclosure = $left_enclosure;
 		if (isset($right_enclosure)) $this->_right_enclosure = $right_enclosure;
 
-		if (! $this->_openFile($filename, $use_include_path)) {
-			throw new InvalidArgumentException(sprintf('Could not locate template file: "%s"', $filename));
-		} else {
+		if ($this->_openFile($filename, $use_include_path)) {
 			$this->_filename = $filename;
+		} else {
+			throw new InvalidArgumentException(sprintf('Could not locate template file: "%s"', $filename));
 		}
 	}
 
