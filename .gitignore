@@ -2,6 +2,8 @@
 *.patch
 /node_modules/
 /_site/
+/.cache/*
+!/.cache/.gitkeep
 /npm-debug.log
 /img/icons.svg
 /_site/
