@@ -11,15 +11,6 @@ trait PDOCacheItemTrait
 {
 	use CacheItemTrait;
 
-	private const TABLE = 'Cache';
-
-	private const COLS  = [
-		'key',
-		'value',
-		'updated',
-		'expires',
-	];
-
 	private $_pdo = null;
 
 	final public function setPDO(PDO $pdo): void
