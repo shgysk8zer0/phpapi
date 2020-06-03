@@ -7,14 +7,24 @@ trait TemplateTrait
 
 	private $_data    = [];
 
-	final public function has(string $key): bool
+	final public function has(string ...$keys): bool
 	{
-		return array_key_exists($this->_convert($key), $this->_data);
+		$found = true;
+		foreach ($keys as $key) {
+			if (! array_key_exists($this->_convert($key), $this->_data)) {
+				$found = false;
+				break;
+			}
+		}
+
+		return $found;
 	}
 
-	final public function remove(string $key): void
+	final public function remove(string ...$keys): void
 	{
-		unset($this->_data[$this->_convert($key)]);
+		foreach ($keys as $key) {
+			unset($this->_data[$this->_convert($key)]);
+		}
 	}
 
 	final public function get(string $key):? string

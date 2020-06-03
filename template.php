@@ -1,6 +1,6 @@
 <?php
 namespace shgysk8zer0\PHPAPI;
-use \shgysk8zer0\PHPAPI\Traits\TemplateTrait;
+use \shgysk8zer0\PHPAPI\Traits\{TemplateTrait};
 use \InvalidArgumentException;
 
 class Template
