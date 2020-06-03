@@ -50,7 +50,7 @@ final class ServerTiming implements LoggerAwareInterface
 	public function getDuration():? float
 	{
 		if (isset($this->_start, $this->_end)) {
-			return $this->_end - $this->_start;
+			return ($this->_end - $this->_start) * 1000;
 		} else {
 			return null;
 		}
