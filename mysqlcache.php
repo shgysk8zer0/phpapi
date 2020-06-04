@@ -114,7 +114,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 
 			if (isset($ttl)) {
 				$date = new DateTimeImmutable();
-				$stm->bindValue(':expires', $date->add($ttl)->getTimestamp());
+				$stm->bindValue(':expires', $date->add($ttl)->format(DateTimeImmutable::W3C));
 			}
 
 			return $stm->execute();
@@ -162,7 +162,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 	public function clearExpired(): bool
 	{
 		if ($stm = $this->_prepare("DELETE FROM `{$this->getTable()}`
-			WHERE datetime(`{$this->getColumn('expires')}`, 'unixepoch') < datetime('now');"
+			WHERE `{$this->getColumn('expires')}` < now();"
 		)) {
 			return $stm->execute();
 		} else {
@@ -173,7 +173,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 	public function getEntries(): array
 	{
 		if ($stm = $this->_prepare("SELECT `{$this->getColumn('key')}` AS `key`,
-			datetime(`{$this->getColumn('expires')}`, 'unixepoch') AS `expires`
+			DATE_FORMAT(`{$this->getColumn('expires')}`, '%Y-%m-%dT%TZ') AS `expires`
 			FROM `{$this->getTable()}`;"
 		)) {
 			if ($stm->execute()) {
@@ -213,7 +213,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 		if ($stm = $this->_prepare("SELECT COUNT(*) AS `matches`
 			FROM `{$this->getTable()}`
 			WHERE `{$this->getColumn('key')}` = :key
-			AND (datetime(`{$this->getColumn('expires')}`, 'unixepoch') > datetime('now'));",
+			AND ({$this->getColumn('expires'}` IS NULL OR {$this->getColumn('expires')}` > now());",
 		'has')) {
 			$stm->bindValue(':key', $key);
 
