@@ -100,20 +100,26 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 		if ($stm = $this->_prepare("INSERT INTO `{$this->getTable()}` (
 				`{$this->getColumn('key')}`,
 				`{$this->getColumn('value')}`,
-				`{$this->getColumn('expires')}`
+				`{$this->getColumn('expires')}`,
+				`{$this->getColumn('created')}`,
+				`{$this->getColumn('modified')}`
 			) VALUES (
 				:key,
 				:value,
-				:expires
+				:expires,
+				:created,
+				:updated
 			) ON DUPLICATE KEY UPDATE
 				`{$this->getColumn('value')}` = :value,
 				`{$this->getColumn('expires')}` = :expires;",
 		'setter')) {
+			$date = new DateTimeImmutable();
 			$stm->bindValue(':key', $key);
 			$stm->bindValue(':value', serialize($value));
+			$stm->bindValue(':created', $date->format(DateTimeImmutable::W3C));
+			$stm->bindValue(':modified', $date->format(DateTimeImmutable::W3C));
 
 			if (isset($ttl)) {
-				$date = new DateTimeImmutable();
 				$stm->bindValue(':expires', $date->add($ttl)->format(DateTimeImmutable::W3C));
 			}
 
@@ -173,7 +179,9 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 	public function getEntries(): array
 	{
 		if ($stm = $this->_prepare("SELECT `{$this->getColumn('key')}` AS `key`,
-			DATE_FORMAT(`{$this->getColumn('expires')}`, '%Y-%m-%dT%TZ') AS `expires`
+			DATE_FORMAT(`{$this->getColumn('expires')}`, '%Y-%m-%dT%TZ') AS `expires`,
+			DATE_FORMAT(`{$this->getColumn('created')}`, '%Y-%m-%dT%TZ') AS `created`,
+			DATE_FORMAT(`{$this->getColumn('modiofied')}`, '%Y-%m-%dT%TZ') AS `modified`
 			FROM `{$this->getTable()}`;"
 		)) {
 			if ($stm->execute()) {
@@ -182,6 +190,8 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 					if (isset($entry->expires)) {
 						$entry->expires = new DateTimeImmutable($entry->expires);
 					}
+					$entry->created = new DateTimeImmutable($entry->created);
+					$entry->modified = new DateTimeImmutable($entry->modified);
 
 					return $entry;
 				}, $stm->fetchAll(PDO::FETCH_CLASS));

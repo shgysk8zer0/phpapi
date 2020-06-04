@@ -9,10 +9,11 @@ trait PDOCacheTrait
 	private $_table = 'cache';
 
 	private $_cols  = [
-		'key'     => 'key',
-		'value'   => 'value',
-		'expires' => 'expires',
-		'created' => 'created',
+		'key'      => 'key',
+		'value'    => 'value',
+		'expires'  => 'expires',
+		'created'  => 'created',
+		'modified' => 'modified',
 	];
 
 	final public function getColumn(string $name): string
