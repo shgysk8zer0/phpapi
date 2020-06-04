@@ -17,6 +17,7 @@ use \shgysk8zer0\PHPAPI\Traits\{
 
 use \DateTimeImmutable;
 use \DateInterval;
+use \DateTimeZone;
 use \StdClass;
 use \PDO;
 
@@ -55,7 +56,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 	{
 		if ($stm = $this->_prepare("SELECT `{$this->getColumn('key')}` AS `key`,
 				`{$this->getColumn('value')}` AS `value`,
-				`{$this->getColumn('expires')}` AS `expires`
+				DATE_FORMAT(`{$this->getColumn('expires')}`, '%Y-%m-%dT%TZ') AS `expires`
 			FROM `{$this->getTable()}`
 			WHERE `{$this->getColumn('key')}` = :key
 			LIMIT 1;", 'getter')) {
@@ -63,7 +64,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 
 			if ($stm->execute() and $result = $stm->fetchObject()) {
 				if (isset($result->expires)) {
-					$result->expires = new DateTimeImmutable("@{$result->expires}");
+					$result->expires = new DateTimeImmutable($result->expires);
 				}
 
 				if (is_null($result->expires) or $result->expires > date('now')) {
@@ -97,6 +98,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 	 */
 	public function set(string $key, object $value, ?DateInterval $ttl = null): bool
 	{
+		$this->logger->debug('Setting {key}', ['key' => $key]);
 		if ($stm = $this->_prepare("INSERT INTO `{$this->getTable()}` (
 				`{$this->getColumn('key')}`,
 				`{$this->getColumn('value')}`,
@@ -108,22 +110,31 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 				:value,
 				:expires,
 				:created,
-				:updated
+				:modified
 			) ON DUPLICATE KEY UPDATE
 				`{$this->getColumn('value')}` = :value,
+				`{$this->getColumn('modified')}` = :modified,
 				`{$this->getColumn('expires')}` = :expires;",
 		'setter')) {
 			$date = new DateTimeImmutable();
+			$date->setTimezone(new DateTimeZone('UTC'));
 			$stm->bindValue(':key', $key);
 			$stm->bindValue(':value', serialize($value));
-			$stm->bindValue(':created', $date->format(DateTimeImmutable::W3C));
-			$stm->bindValue(':modified', $date->format(DateTimeImmutable::W3C));
+			$stm->bindValue(':created', $date->format('Y-m-d H:i:s'));
+			$stm->bindValue(':modified', $date->format('Y-m-d H:i:s'));
 
 			if (isset($ttl)) {
-				$stm->bindValue(':expires', $date->add($ttl)->format(DateTimeImmutable::W3C));
+				$stm->bindValue(':expires', $date->add($ttl)->format('Y-m-d H:i:s'));
+			} else {
+				$stm->bindValue(':expires', null);
 			}
 
-			return $stm->execute();
+			if ($stm->execute()) {
+				return true;
+			} else {
+				Console::error(['code' => $stm->errorCode(), 'msg' => $stm->errorInfo()]);
+				return false;
+			}
 		} else {
 			return false;
 		}
@@ -168,7 +179,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 	public function clearExpired(): bool
 	{
 		if ($stm = $this->_prepare("DELETE FROM `{$this->getTable()}`
-			WHERE `{$this->getColumn('expires')}` < now();"
+			WHERE `{$this->getColumn('expires')}` < UTC_TIMESTAMP();"
 		)) {
 			return $stm->execute();
 		} else {
@@ -181,7 +192,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 		if ($stm = $this->_prepare("SELECT `{$this->getColumn('key')}` AS `key`,
 			DATE_FORMAT(`{$this->getColumn('expires')}`, '%Y-%m-%dT%TZ') AS `expires`,
 			DATE_FORMAT(`{$this->getColumn('created')}`, '%Y-%m-%dT%TZ') AS `created`,
-			DATE_FORMAT(`{$this->getColumn('modiofied')}`, '%Y-%m-%dT%TZ') AS `modified`
+			DATE_FORMAT(`{$this->getColumn('modified')}`, '%Y-%m-%dT%TZ') AS `modified`
 			FROM `{$this->getTable()}`;"
 		)) {
 			if ($stm->execute()) {
@@ -223,7 +234,10 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 		if ($stm = $this->_prepare("SELECT COUNT(*) AS `matches`
 			FROM `{$this->getTable()}`
 			WHERE `{$this->getColumn('key')}` = :key
-			AND ({$this->getColumn('expires')}` IS NULL OR {$this->getColumn('expires')}` > now());",
+			AND (
+				`{$this->getColumn('expires')}` IS NULL
+				OR `{$this->getColumn('expires')}` > UTC_TIMESTAMP()
+			);",
 		'has')) {
 			$stm->bindValue(':key', $key);
 
