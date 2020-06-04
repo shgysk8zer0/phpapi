@@ -223,7 +223,7 @@ class MySQLCache implements CacheInterface, LoggerAwareInterface
 		if ($stm = $this->_prepare("SELECT COUNT(*) AS `matches`
 			FROM `{$this->getTable()}`
 			WHERE `{$this->getColumn('key')}` = :key
-			AND ({$this->getColumn('expires'}` IS NULL OR {$this->getColumn('expires')}` > now());",
+			AND ({$this->getColumn('expires')}` IS NULL OR {$this->getColumn('expires')}` > now());",
 		'has')) {
 			$stm->bindValue(':key', $key);
 
