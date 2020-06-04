@@ -26,7 +26,7 @@ final class ServerTiming implements LoggerAwareInterface
 			$this->setLogger($logger);
 			$this->logger->debug('New timer: {name}', ['name' => $name]);
 		} else {
-			$this->setLogger(new SAPILogger());
+			$this->setLogger(new NullLogger());
 		}
 
 		$this->setName($name);
