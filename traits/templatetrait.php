@@ -51,6 +51,20 @@ trait TemplateTrait
 		}
 	}
 
+	final public function setFromFile(
+		string $key,
+		string $filename,
+		bool   $html_escape = true,
+		string $charset     = 'UTF-8',
+		int    $flags       = ENT_COMPAT | ENT_HTML5
+	): void {
+		if (file_exists($filename)) {
+			$this->set($key, file_get_contents($filename), $html_escape, $charset, $flags);
+		} else {
+			throw new InvalidArgumentException(sprintf('File not found: %s', $filename));
+		}
+	}
+
 	final public function stringify(
 		bool $strip_comments = false,
 		bool $trim           = false,

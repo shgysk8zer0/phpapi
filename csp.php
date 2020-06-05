@@ -17,7 +17,7 @@ final class CSP implements \JSONSerializable
 		'strict-dynamic' => "'strict-dynamic'",
 	];
 
-	final public function __construct(string $default_src = 'none')
+	final public function __construct(string $default_src = "'none'")
 	{
 		$this->_set('default-src', $default_src);
 	}
@@ -25,6 +25,18 @@ final class CSP implements \JSONSerializable
 	final public function jsonSerialize(): array
 	{
 		return $this->_policy;
+	}
+
+	final public function hashFile(string $filename, string $algo = 'sha256'):? string
+	{
+		if (file_exists($filename)) {
+			if (! in_array($algo, hash_algos())) {
+				throw new InvalidArgumentExeption(sprintf('Unsupported hash algorithm: %s', $algo));
+			}
+			return sprintf('\'%s-%s\'', $algo, base64_encode(hash_file($algo, $filename, true)));
+		} else {
+			return null;
+		}
 	}
 
 	final public function send(): void
