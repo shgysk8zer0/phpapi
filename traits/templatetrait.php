@@ -84,6 +84,11 @@ trait TemplateTrait
 		return $this->_data;
 	}
 
+	final protected function _setData(array $data): void
+	{
+		$this->_data = $data;
+	}
+
 	final public function openFile(string $filename, bool $use_include_path = false): bool
 	{
 		if ($content = @file_get_contents($filename, $use_include_path)) {
