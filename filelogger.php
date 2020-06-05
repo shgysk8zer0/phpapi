@@ -3,6 +3,7 @@ namespace shgysk8zer0\PHPAPI;
 
 use \shgysk8zer0\PHPAPI\Traits\{
 	LoggerInterpolatorTrait,
+	LoggerLevelsTrait,
 	SPLObserverLoggerTrait,
 };
 
@@ -14,6 +15,7 @@ use \InvalidArgumentException;
 class FileLogger extends AbstractLogger implements SPLObserver
 {
 	use LoggerInterpolatorTrait;
+	use LoggerLevelsTrait;
 	use SPLObserverLoggerTrait;
 
 	public const LOG_FILE = 'errors.log';
@@ -27,9 +29,9 @@ class FileLogger extends AbstractLogger implements SPLObserver
 
 	final public function log(string $level, string $message, array $context = []): void
 	{
-		if (! in_array($level, LogLevel::ALL_LEVELS)) {
+		if (! $this->validLevel($level)) {
 			throw new InvalidArgumentException(sprintf('Invalid log level: "%s"', $level));
-		} else {
+		} elseif ($this->allowsLevel($level)) {
 			$msg = sprintf('[%s] %s', $level, $this->interpolate($message, $context));
 			error_log($msg . PHP_EOL, 3, $this->_file);
 		}

@@ -6,11 +6,13 @@ use \InvalidArgumentException;
 
 trait SystemLoggerTrait
 {
+	use LoggerLevelsTrait;
+
 	final public function log(string $level, string $message, array $context = []): void
 	{
 		if (! in_array($level, LogLevel::ALL_LEVELS)) {
 			throw new InvalidArgumentException(sprintf('Invalid log level: "%s"', $level));
-		} else {
+		} elseif ($this->allowsLevel($level)) {
 			switch ($level) {
 				case LogLevel::EMERGENCY:
 					$lvl = LOG_EMERG;

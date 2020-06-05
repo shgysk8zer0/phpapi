@@ -6,11 +6,13 @@ use \InvalidArgumentException;
 
 trait SAPILoggerTrait
 {
+	use LoggerLevelsTrait;
+
 	final public function log(string $level, string $message, array $context = []): void
 	{
-		if (! in_array($level, LogLevel::ALL_LEVELS)) {
+		if (! $this->validLevel($level)) {
 			throw new InvalidArgumentException(sprintf('Invalid log level: "%s"', $level));
-		} elseif (in_array(PHP_SAPI, ['cli', 'cli-server'])) {
+		} elseif ($this->allowsLevel($level) and in_array(PHP_SAPI, ['cli', 'cli-server'])) {
 			$msg = sprintf('[%s] "%s"', $level, $this->interpolate($message, $context));
 			error_log($msg, 4);
 		}
