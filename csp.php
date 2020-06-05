@@ -39,6 +39,15 @@ final class CSP implements \JSONSerializable
 		}
 	}
 
+	final public function hash(string $content, string $algo = 'sha256'): string
+	{
+		if (! in_array($algo, hash_algos())) {
+			throw new InvalidArgumentExeption(sprintf('Unsupported hash algorithm: %s', $algo));
+		}
+
+		return sprintf('\'%s-%s\'', $algo, base64_encode(hash($algo, $content, true)));
+	}
+
 	final public function send(): void
 	{
 		if (headers_sent()) {
