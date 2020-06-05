@@ -14,6 +14,7 @@ trait ExceptionLoggerTrait
 	{
 		set_exception_handler([$this, 'logException']);
 	}
+
 	final public function logException(Throwable $e, string $level = LogLevel::ERROR): void
 	{
 		$this->log($level, '[{class} {code}] "{message}" at {file}:{line}', [

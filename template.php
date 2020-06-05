@@ -28,7 +28,7 @@ class Template implements Serializable
 
 	private $_filename         = null;
 
-	private $_use_include_path = USE_INCLUDE_PATH;
+	private $_use_include_path = self::USE_INCLUDE_PATH;
 
 	public function __construct(
 		string $filename,
